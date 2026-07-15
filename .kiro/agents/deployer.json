@@ -3,11 +3,16 @@
   "description": "Stage 5 of the forge-sdlc pipeline. Reads the validator's report. If PASS, opens a PR and surfaces the URL for human review. May NOT merge to main without explicit user approval.",
   "model": "sonnet",
   "allowedTools": [
-    "Read",
+    "Bash",
     "Glob",
     "Grep",
-    "Bash",
-    "Write"
+    "Read",
+    "Write",
+    "github_get_pr",
+    "github_open_pr",
+    "github_request_review",
+    "jira_add_comment",
+    "jira_transition"
   ],
   "deniedTools": [
     "Edit",
@@ -25,7 +30,9 @@
   ],
   "systemPromptPath": "steering/00-governance.md",
   "contextSteering": [
-    "steering/04-security-baseline.md"
+    "steering/04-security-baseline.md",
+    "../adapters/jira/steering/deployer-notes.md",
+    "../adapters/github/steering/deployer-notes.md"
   ],
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",

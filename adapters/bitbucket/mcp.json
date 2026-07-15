@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "bitbucket": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-bitbucket"],
+      "env": {
+        "BITBUCKET_WORKSPACE": "${env:BITBUCKET_WORKSPACE}",
+        "BITBUCKET_REPO": "${env:BITBUCKET_REPO}",
+        "BITBUCKET_EMAIL": "${env:BITBUCKET_EMAIL}",
+        "BITBUCKET_APP_PASSWORD": "${env:BITBUCKET_APP_PASSWORD}"
+      },
+      "description": "Bitbucket Cloud MCP server — repos, branches, PRs. Tools mirror the GitHub adapter."
+    }
+  }
+}

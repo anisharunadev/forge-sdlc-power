@@ -1,0 +1,26 @@
+{
+  "$schema": "./adapter.schema.json",
+  "version": 1,
+  "adapters": {
+    "jira": {
+      "enabled": true,
+      "installedAt": "2026-07-15T18:46:00Z",
+      "version": "1.0.0"
+    },
+    "github": {
+      "enabled": true,
+      "installedAt": "2026-07-15T18:46:00Z",
+      "version": "1.0.0"
+    },
+    "bitbucket": {
+      "enabled": false,
+      "version": "1.0.0",
+      "reason": "Not used in this project. Enable with: node adapters/install.js --enable bitbucket"
+    },
+    "clickup": {
+      "enabled": false,
+      "version": "1.0.0",
+      "reason": "Not used in this project. Enable with: node adapters/install.js --enable clickup"
+    }
+  }
+}

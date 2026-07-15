@@ -3,13 +3,19 @@
   "description": "Stage 3 of the forge-sdlc pipeline. Reads the ADR, implements the change, writes tests, and produces a clean diff. The hook layer (PreToolUse) enforces that lockfiles, linter configs, and .env* cannot be edited.",
   "model": "sonnet",
   "allowedTools": [
-    "Read",
+    "Bash",
+    "Edit",
     "Glob",
     "Grep",
-    "Write",
-    "Edit",
     "MultiEdit",
-    "Bash"
+    "Read",
+    "Write",
+    "github_create_branch",
+    "github_list_branches",
+    "github_push_files",
+    "jira_add_comment",
+    "jira_add_label",
+    "jira_transition"
   ],
   "deniedTools": [
     "Task"
@@ -45,7 +51,9 @@
   "systemPromptPath": "steering/00-governance.md",
   "contextSteering": [
     "steering/01-stage-patterns.md",
-    "steering/02-tooling-conventions.md"
+    "steering/02-tooling-conventions.md",
+    "../adapters/jira/steering/implementer-notes.md",
+    "../adapters/github/steering/implementer-notes.md"
   ],
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",

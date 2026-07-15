@@ -1,0 +1,76 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "bitbucket",
+  "version": "1.0.0",
+  "description": "Bitbucket Cloud repository operations — branches, commits, pull requests. Drop-in alternative to the GitHub adapter for teams on Bitbucket.",
+  "mcpServers": ["bitbucket"],
+  "tools": [
+    {
+      "name": "bitbucket_get_repo",
+      "description": "Fetch repo metadata (mainbranch, project, workspace).",
+      "stages": ["planner", "architect"],
+      "readOnly": true
+    },
+    {
+      "name": "bitbucket_create_branch",
+      "description": "Create a feature branch from mainbranch. Naming: '<type>/<KEY>-<desc>'.",
+      "stages": ["implementer"],
+      "idempotent": true
+    },
+    {
+      "name": "bitbucket_push_files",
+      "description": "Push file changes to a branch in one or more commits.",
+      "stages": ["implementer"]
+    },
+    {
+      "name": "bitbucket_open_pr",
+      "description": "Open a pull request. Title follows conventional commits. Body includes the validator report link.",
+      "stages": ["deployer"]
+    },
+    {
+      "name": "bitbucket_get_pr",
+      "description": "Fetch PR details including build status, reviewer state, and mergeable flag.",
+      "stages": ["validator", "deployer"],
+      "readOnly": true
+    },
+    {
+      "name": "bitbucket_merge_pr",
+      "description": "Merge a PR. BLOCKED for the deployer by the hook layer — only the user can merge.",
+      "stages": []
+    }
+  ],
+  "envVars": [
+    {
+      "name": "BITBUCKET_WORKSPACE",
+      "required": true,
+      "description": "Atlassian Bitbucket workspace slug, e.g. 'acme'."
+    },
+    {
+      "name": "BITBUCKET_REPO",
+      "required": true,
+      "description": "Repository slug within the workspace."
+    },
+    {
+      "name": "BITBUCKET_EMAIL",
+      "required": true,
+      "description": "Atlassian account email for the app password."
+    },
+    {
+      "name": "BITBUCKET_APP_PASSWORD",
+      "required": true,
+      "secret": true,
+      "description": "App password from id.atlassian.com → App passwords. Scopes: 'repository:write', 'pullrequest:write'."
+    }
+  ],
+  "steering": ["steering/usage.md"],
+  "stage": {
+    "implementer": {
+      "systemPromptAdditions": "steering/implementer-notes.md"
+    },
+    "deployer": {
+      "systemPromptAdditions": "steering/deployer-notes.md"
+    }
+  },
+  "homepage": "https://bitbucket.org",
+  "license": "MIT"
+}

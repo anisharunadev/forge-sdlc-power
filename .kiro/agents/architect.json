@@ -3,10 +3,13 @@
   "description": "Stage 2 of the forge-sdlc pipeline. Reads the planner's plan, makes design decisions, and writes an Architecture Decision Record (ADR). No code edits — only design docs.",
   "model": "opus",
   "allowedTools": [
-    "Read",
     "Glob",
     "Grep",
-    "Write"
+    "Read",
+    "Write",
+    "github_get_repo",
+    "jira_get_ticket",
+    "jira_search"
   ],
   "deniedTools": [
     "Edit",

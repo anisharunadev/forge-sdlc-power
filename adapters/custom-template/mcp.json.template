@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "<key-1>": {
+      "command": "<command-to-launch-the-mcp-server>",
+      "args": ["<arg-1>", "<arg-2>"],
+      "env": {
+        "<ENV_VAR_NAME>": "${env:<ENV_VAR_NAME>}"
+      },
+      "description": "<what this MCP server does>"
+    }
+  }
+}

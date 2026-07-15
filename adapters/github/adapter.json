@@ -1,0 +1,78 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "github",
+  "version": "1.0.0",
+  "description": "GitHub repository operations — branches, commits, PRs, checks. Used during implement (push branch) and deploy (open PR).",
+  "mcpServers": ["github"],
+  "tools": [
+    {
+      "name": "github_get_repo",
+      "description": "Fetch repo metadata (default branch, visibility, permissions).",
+      "stages": ["planner", "architect"],
+      "readOnly": true
+    },
+    {
+      "name": "github_list_branches",
+      "description": "List branches matching a pattern. Used to find existing work for a ticket.",
+      "stages": ["planner", "implementer"],
+      "readOnly": true
+    },
+    {
+      "name": "github_create_branch",
+      "description": "Create a new branch from a base. Naming: 'feat/PROJ-401-short-description' or 'fix/PROJ-401-...'.",
+      "stages": ["implementer"],
+      "idempotent": true
+    },
+    {
+      "name": "github_push_files",
+      "description": "Push one or more file changes to a branch in a single commit.",
+      "stages": ["implementer"]
+    },
+    {
+      "name": "github_open_pr",
+      "description": "Open a pull request. Title follows conventional commit format. Body includes the validator report link.",
+      "stages": ["deployer"]
+    },
+    {
+      "name": "github_get_pr",
+      "description": "Fetch PR details including CI status, review state, and mergeable flag.",
+      "stages": ["validator", "deployer"],
+      "readOnly": true
+    },
+    {
+      "name": "github_request_review",
+      "description": "Request a review from a user or team. Deployer uses this after opening the PR.",
+      "stages": ["deployer"],
+      "idempotent": true
+    },
+    {
+      "name": "github_merge_pr",
+      "description": "Merge a PR. The deployer is BLOCKED from calling this by the hook layer — only the user can merge.",
+      "stages": []
+    }
+  ],
+  "envVars": [
+    {
+      "name": "GITHUB_TOKEN",
+      "required": true,
+      "secret": true,
+      "description": "Personal access token or fine-grained token with 'contents:write', 'pull_requests:write', 'metadata:read' scopes."
+    },
+    {
+      "name": "GITHUB_DEFAULT_REPO",
+      "required": false,
+      "description": "owner/repo, e.g. 'acme/api'. If unset, the tool infers from the local git remote."
+    }
+  ],
+  "steering": ["steering/usage.md", "steering/pr-conventions.md"],
+  "stage": {
+    "implementer": {
+      "systemPromptAdditions": "steering/implementer-notes.md"
+    },
+    "deployer": {
+      "systemPromptAdditions": "steering/deployer-notes.md"
+    }
+  },
+  "homepage": "https://github.com",
+  "license": "MIT"
+}

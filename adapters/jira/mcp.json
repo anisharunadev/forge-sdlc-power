@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "jira": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-jira"],
+      "env": {
+        "JIRA_HOST": "${env:JIRA_HOST}",
+        "JIRA_EMAIL": "${env:JIRA_EMAIL}",
+        "JIRA_TOKEN": "${env:JIRA_TOKEN}"
+      },
+      "description": "Jira ticket read/write via MCP. Tools: jira_get_ticket, jira_search, jira_transition, jira_add_comment, jira_add_label."
+    }
+  }
+}

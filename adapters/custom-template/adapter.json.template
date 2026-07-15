@@ -1,0 +1,27 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "<adapter-name>",
+  "version": "0.1.0",
+  "description": "<one-sentence description of what this adapter integrates with>",
+  "mcpServers": ["<key-1>"],
+  "tools": [
+    {
+      "name": "<mcp-tool-name-1>",
+      "description": "<what this tool does, in one sentence>",
+      "stages": ["<planner|architect|implementer|validator|deployer>"],
+      "readOnly": true
+    }
+  ],
+  "envVars": [
+    {
+      "name": "<ENV_VAR_NAME>",
+      "required": true,
+      "secret": true,
+      "description": "<where to get this credential>"
+    }
+  ],
+  "steering": ["steering/usage.md"],
+  "stage": {},
+  "homepage": "<url>",
+  "license": "MIT"
+}

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}",
+        "GITHUB_DEFAULT_REPO": "${env:GITHUB_DEFAULT_REPO}"
+      },
+      "description": "GitHub MCP server — repos, branches, PRs, checks. Tools: github_get_repo, github_list_branches, github_create_branch, github_push_files, github_open_pr, github_get_pr, github_request_review."
+    }
+  }
+}

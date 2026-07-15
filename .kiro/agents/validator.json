@@ -3,11 +3,15 @@
   "description": "Stage 4 of the forge-sdlc pipeline. INDEPENDENT verification of the implementer's diff. Runs deterministic checks (typecheck, lint, tests, secret scan) and writes a verifier report. No code edits. Different model than implementer by design.",
   "model": "opus",
   "allowedTools": [
-    "Read",
+    "Bash",
     "Glob",
     "Grep",
-    "Bash",
-    "Write"
+    "Read",
+    "Write",
+    "github_get_pr",
+    "jira_add_comment",
+    "jira_add_label",
+    "jira_get_ticket"
   ],
   "deniedTools": [
     "Edit",

@@ -3,10 +3,14 @@
   "description": "Stage 1 of the forge-sdlc pipeline. Reads the ticket, searches the codebase, and produces a structured implementation plan with testable success criteria. Read-only — no code edits.",
   "model": "sonnet",
   "allowedTools": [
-    "Read",
     "Glob",
     "Grep",
-    "Write"
+    "Read",
+    "Write",
+    "github_get_repo",
+    "github_list_branches",
+    "jira_get_ticket",
+    "jira_search"
   ],
   "deniedTools": [
     "Edit",

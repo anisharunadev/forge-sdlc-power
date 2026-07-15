@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://forge-sdlc.dev/schemas/adapter.schema.json",
+  "title": "forge-sdlc adapter manifest",
+  "description": "Schema for an adapter manifest. Each adapter under adapters/<name>/ has an adapter.json that conforms to this.",
+  "type": "object",
+  "required": ["name", "version", "description", "mcpServers", "tools"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$",
+      "description": "Lowercase, kebab-case. Must match the directory name under adapters/."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-z0-9.-]+)?$",
+      "description": "Semver. Bump on any tool/stage/routing change."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 280,
+      "description": "What this adapter integrates with. One sentence, no marketing."
+    },
+    "mcpServers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+        "description": "Key under mcpServers in this adapter's mcp.json. Multiple servers allowed for composite adapters."
+      },
+      "description": "Keys of MCP server entries in this adapter's mcp.json."
+    },
+    "tools": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "stages"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,127}$",
+            "description": "MCP tool name as exposed by the server."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 280
+          },
+          "stages": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": ["planner", "architect", "implementer", "validator", "deployer", "orchestrator", "*"]
+            },
+            "description": "Stages allowed to call this tool. '*' = any stage. The orchestrator never calls adapter tools directly — it spawns sub-agents that do."
+          },
+          "readOnly": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the tool only reads state. Validator can call read-only tools even if not in its stages list."
+          },
+          "idempotent": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the tool is safe to retry (e.g. status transitions, label adds). Hook layer may auto-retry on transient failures."
+          }
+        }
+      }
+    },
+    "envVars": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "required"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]{1,63}$",
+            "description": "Env var name. UPPER_SNAKE_CASE."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "If true, the install script refuses to enable the adapter unless this env var is set."
+          },
+          "secret": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the install script verifies the value comes from ${env:...} indirection, not inline."
+          },
+          "description": {
+            "type": "string",
+            "description": "Where to get this credential. e.g. 'Atlassian account settings → API tokens'."
+          }
+        }
+      }
+    },
+    "steering": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(steering/.*|skills/.*)\\.md$",
+        "description": "Path to a steering file. Loaded on-demand into sub-agents that use this adapter."
+      }
+    },
+    "stage": {
+      "type": "object",
+      "description": "Per-stage overrides. Use to inject stage-specific notes that aren't in the main usage.md.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "systemPromptAdditions": {
+            "type": "string",
+            "description": "Path to a markdown file appended to the stage agent's system prompt when this adapter is enabled."
+          }
+        }
+      }
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri"
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX identifier, e.g. 'MIT', 'Apache-2.0'."
+    }
+  }
+}

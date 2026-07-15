@@ -1,0 +1,67 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "jira",
+  "version": "1.0.0",
+  "description": "Jira ticket read/write — read tickets during plan/validate, transition status and add comments during implement/deploy.",
+  "mcpServers": ["jira"],
+  "tools": [
+    {
+      "name": "jira_get_ticket",
+      "description": "Fetch a Jira ticket by key (e.g. PROJ-401). Returns summary, description, status, assignee, and acceptance criteria.",
+      "stages": ["planner", "architect", "validator"],
+      "readOnly": true
+    },
+    {
+      "name": "jira_search",
+      "description": "Search Jira issues using JQL. Returns ticket keys, summaries, and statuses.",
+      "stages": ["planner", "architect"],
+      "readOnly": true
+    },
+    {
+      "name": "jira_transition",
+      "description": "Move a ticket through workflow states (e.g. To Do → In Progress → In Review → Done).",
+      "stages": ["implementer", "deployer"],
+      "idempotent": true
+    },
+    {
+      "name": "jira_add_comment",
+      "description": "Post a comment to a Jira ticket. Use to surface PR URLs, validator reports, and blockers.",
+      "stages": ["implementer", "deployer", "validator"]
+    },
+    {
+      "name": "jira_add_label",
+      "description": "Add a label to a ticket. Use to flag tickets that touched a particular subsystem (e.g. 'security-review-required').",
+      "stages": ["implementer", "validator"],
+      "idempotent": true
+    }
+  ],
+  "envVars": [
+    {
+      "name": "JIRA_HOST",
+      "required": true,
+      "description": "Atlassian Cloud host, e.g. 'yourorg.atlassian.net'. No scheme, no trailing slash."
+    },
+    {
+      "name": "JIRA_EMAIL",
+      "required": true,
+      "description": "Email of the service account that owns the API token."
+    },
+    {
+      "name": "JIRA_TOKEN",
+      "required": true,
+      "secret": true,
+      "description": "API token from id.atlassian.com → Security → API tokens. NEVER commit."
+    }
+  ],
+  "steering": ["steering/usage.md", "steering/jql-reference.md"],
+  "stage": {
+    "implementer": {
+      "systemPromptAdditions": "steering/implementer-notes.md"
+    },
+    "deployer": {
+      "systemPromptAdditions": "steering/deployer-notes.md"
+    }
+  },
+  "homepage": "https://www.atlassian.com/software/jira",
+  "license": "MIT"
+}

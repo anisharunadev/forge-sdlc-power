@@ -1,0 +1,36 @@
+---
+inclusion: on-demand
+description: How to use the <adapter-name> MCP adapter. Loaded when a sub-agent is about to call a <adapter-name> tool.
+---
+
+# <Adapter display name> adapter — usage
+
+This file is loaded into the sub-agent's context when it is about to use a <adapter-name> tool. The `description` above is what triggers the harness to load it.
+
+## Tool semantics
+
+### `<tool-name-1>(<args>)`
+- Returns: `<shape>`
+- Use for: `<purpose>`
+- Idempotent: yes/no
+
+### `<tool-name-2>(<args>)`
+- Returns: `<shape>`
+- Use for: `<purpose>`
+
+## Conventions
+
+- <convention 1>
+- <convention 2>
+- <convention 3>
+
+## Common failures
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `<error>` | `<cause>` | `<fix>` |
+
+## Security
+
+- `<credential>` is secret. Env var only, no inline values, no logs.
+- `<other security note>`

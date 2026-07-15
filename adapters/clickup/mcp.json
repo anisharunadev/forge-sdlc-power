@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "clickup": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-clickup"],
+      "env": {
+        "CLICKUP_API_TOKEN": "${env:CLICKUP_API_TOKEN}",
+        "CLICKUP_TEAM_ID": "${env:CLICKUP_TEAM_ID}"
+      },
+      "description": "ClickUp MCP server — tasks, lists, spaces, custom fields. Tools mirror the Jira adapter with ClickUp semantics."
+    }
+  }
+}

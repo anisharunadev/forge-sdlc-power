@@ -1,0 +1,62 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "clickup",
+  "version": "1.0.0",
+  "description": "ClickUp task read/write — list, spaces, tasks, comments, custom fields. Drop-in alternative to the Jira adapter for teams on ClickUp.",
+  "mcpServers": ["clickup"],
+  "tools": [
+    {
+      "name": "clickup_get_task",
+      "description": "Fetch a ClickUp task by ID. Returns name, description, status, assignees, custom fields, and checklist items.",
+      "stages": ["planner", "architect", "validator"],
+      "readOnly": true
+    },
+    {
+      "name": "clickup_search_tasks",
+      "description": "Search tasks using ClickUp filters (list, space, status, assignee). Returns task IDs and summaries.",
+      "stages": ["planner", "architect"],
+      "readOnly": true
+    },
+    {
+      "name": "clickup_update_status",
+      "description": "Move a task to a new status (e.g. 'in progress', 'in review', 'complete').",
+      "stages": ["implementer", "deployer"],
+      "idempotent": true
+    },
+    {
+      "name": "clickup_add_comment",
+      "description": "Post a comment to a ClickUp task. Use to surface PR URLs, validator reports, and blockers.",
+      "stages": ["implementer", "deployer", "validator"]
+    },
+    {
+      "name": "clickup_set_custom_field",
+      "description": "Set a custom field value. Use to link tasks to PRs or flag work for review.",
+      "stages": ["deployer"],
+      "idempotent": true
+    }
+  ],
+  "envVars": [
+    {
+      "name": "CLICKUP_API_TOKEN",
+      "required": true,
+      "secret": true,
+      "description": "Personal API token from app.clickup.com → Settings → Apps → API Token."
+    },
+    {
+      "name": "CLICKUP_TEAM_ID",
+      "required": true,
+      "description": "Numeric team (workspace) ID. Find it in the URL when viewing the workspace."
+    }
+  ],
+  "steering": ["steering/usage.md"],
+  "stage": {
+    "implementer": {
+      "systemPromptAdditions": "steering/implementer-notes.md"
+    },
+    "deployer": {
+      "systemPromptAdditions": "steering/deployer-notes.md"
+    }
+  },
+  "homepage": "https://clickup.com",
+  "license": "MIT"
+}
