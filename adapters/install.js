@@ -27,10 +27,22 @@ const ROOT = process.cwd();
 const ADAPTERS_DIR = path.join(ROOT, 'adapters');
 const REGISTRY_FILE = path.join(ADAPTERS_DIR, 'registry.json');
 const SCHEMA_FILE = path.join(ADAPTERS_DIR, 'adapter.schema.json');
-const ROOT_MCP = path.join(ROOT, 'mcp.json');
-const AGENTS_DIR = path.join(ROOT, '.kiro', 'agents');
-const STEERING_DIR = path.join(ROOT, 'steering');
+// ponytail: PKG_ROOT holds the package source (where adapters/registry.json live);
+// PROJECT_ROOT holds where the wired artifacts (mcp.json, .kiro/, steering/) land.
+// In the simple case they're the same dir; --root lets npx-style installs target a
+// different project dir without copy/symlink gymnastics.
+const PKG_ROOT = ROOT;
+const cmdRoot = (() => {
+  const args = process.argv.slice(2);
+  const i = args.indexOf('--root');
+  return i >= 0 ? args[i + 1] : null;
+})();
+const PROJECT_ROOT = cmdRoot ? path.resolve(cmdRoot) : ROOT;
+const ROOT_MCP = path.join(PROJECT_ROOT, 'mcp.json');
+const AGENTS_DIR = path.join(PROJECT_ROOT, '.kiro', 'agents');
+const STEERING_DIR = path.join(PROJECT_ROOT, 'steering');
 const ADAPTER_STEERING_LINK = path.join(STEERING_DIR, 'adapters');
+const FORGE_DIR = path.join(PROJECT_ROOT, '.forge');
 
 // ---------- arg parsing ----------
 
@@ -101,6 +113,9 @@ function mergeMcp() {
   // Start from a clean slate — collect MCP servers ONLY from enabled adapters.
   // Disabled adapters have their servers removed.
   const merged = { mcpServers: {} };
+  // ponytail: track whether mergeMcp mutated the registry (env-var auto-disable).
+  // Saves once at end if anything flipped — avoids re-saving for every adapter.
+  let registryDirty = false;
 
   for (const [name, entry] of Object.entries(reg.adapters)) {
     if (!entry.enabled) continue;
@@ -112,8 +127,16 @@ function mergeMcp() {
     const { manifest } = loaded;
     const envCheck = checkEnvVars(manifest);
     if (!envCheck.ok) {
+      // ponytail: registry was lying — flip it to disabled with a clear reason so
+      // `doctor` and `--status` show reality. User re-enables via --enable after
+      // exporting the missing env vars. Exit code stays 0 — this is a self-heal,
+      // not a hard failure.
       console.error(`[install] adapter "${name}" enabled but env vars missing: ${envCheck.missing.join(', ')}`);
-      console.error(`[install] skipping. set the env vars and re-run.`);
+      console.error(`[install] auto-disabling "${name}" — export the env vars and re-run \`forge-sdlc-agent install --enable ${name}\``);
+      reg.adapters[name].enabled = false;
+      reg.adapters[name].reason = `missing env vars: ${envCheck.missing.join(', ')}`;
+      delete reg.adapters[name].installedAt;
+      registryDirty = true;
       continue;
     }
     const adapterMcp = loadAdapterMcp(name);
@@ -149,6 +172,7 @@ function mergeMcp() {
   }
 
   fs.writeFileSync(ROOT_MCP, JSON.stringify(merged, null, 2) + '\n');
+  if (registryDirty) saveRegistry(reg);
   console.log(`[install] wrote ${ROOT_MCP} with ${Object.keys(merged.mcpServers).length} MCP servers`);
   return merged;
 }
@@ -506,7 +530,7 @@ function generateCI() {
   if (!fs.existsSync(GENERATOR)) return; // ci feature not installed
   const r = spawnSync(process.execPath, [GENERATOR, '--target', ciTarget, '-o', ciOutput], {
     encoding: 'utf8',
-    cwd: ROOT,
+    cwd: PROJECT_ROOT,
     timeout: 15000,
   });
   if (r.status === 0) {
@@ -537,7 +561,7 @@ function writeTicketSystemConfig() {
   else if (reg.adapters.clickup && reg.adapters.clickup.enabled) system = 'clickup';
   else if (reg.adapters.linear && reg.adapters.linear.enabled) system = 'linear';
 
-  const dir = path.join(ROOT, '.forge');
+  const dir = FORGE_DIR;
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(
     path.join(dir, 'ticket-system.json'),
@@ -556,7 +580,7 @@ function writeNextCommandsConfig() {
     '4': '/forge deploy <KEY>',
     '5': 'review and merge',
   };
-  const dir = path.join(ROOT, '.forge');
+  const dir = FORGE_DIR;
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(
     path.join(dir, 'next-commands.json'),

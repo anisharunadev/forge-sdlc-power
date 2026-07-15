@@ -1,7 +1,6 @@
 {
   "name": "forge-sdlc-agent",
   "version": "2.2.0",
-  "private": true,
   "description": "CLI control plane for the FORGE SDLC Power — interactive install, state machine v2, continuous memory v2, resume/restart.",
   "bin": {
     "forge-sdlc-agent": "bin/forge-sdlc-agent.js"

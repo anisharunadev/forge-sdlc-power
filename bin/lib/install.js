@@ -53,14 +53,17 @@ async function installInteractive(argv) {
 
   // 4. Run the canonical adapters/install.js apply.
   // Always run it from REPO_ROOT because install.js reads adapters/registry.json
-  // relative to cwd. In project mode, the user has cloned or linked the repo
-  // into their project (or is running the CLI from inside the repo); in global
-  // mode, the repo IS the global home.
+  // relative to cwd. In project mode, --root tells install.js where to write the
+  // project-side artifacts (mcp.json, .kiro/, steering/) so npx-style installs
+  // land in the user's project instead of the npx cache.
   console.log(`\n[install] mode=${resolved.mode} root=${resolved.root}`);
-  const installCwd = resolved.mode === 'global' ? REPO_ROOT : REPO_ROOT;
-  const r = spawnSync(process.execPath, [path.join(REPO_ROOT, 'adapters', 'install.js')], {
+  const installArgs = [path.join(REPO_ROOT, 'adapters', 'install.js')];
+  if (resolved.mode === 'project' && resolved.root !== REPO_ROOT) {
+    installArgs.push('--root', resolved.root);
+  }
+  const r = spawnSync(process.execPath, installArgs, {
     stdio: 'inherit',
-    cwd: installCwd,
+    cwd: REPO_ROOT,
   });
   if (r.status !== 0) {
     console.error(`[install] adapters/install.js exited ${r.status}`);
