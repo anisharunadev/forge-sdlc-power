@@ -1,6 +1,6 @@
 {
   "name": "forge-sdlc-agent",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "CLI control plane for the FORGE SDLC Power — interactive install, state machine v2, continuous memory v2, resume/restart.",
   "bin": {
     "forge-sdlc-agent": "bin/forge-sdlc-agent.js"
@@ -13,5 +13,20 @@
     "verify": "node adapters/install.js --verify",
     "start": "node bin/forge-sdlc-agent.js"
   },
-  "files": ["bin", "POWER.md", "README.md", "mcp.json", ".kiro", "steering", "rules", "adapters", "hooks", "templates", "skills", "examples", "runtime", "enterprise"]
+  "files": [
+    "bin",
+    "POWER.md",
+    "README.md",
+    "mcp.json",
+    ".kiro",
+    "steering",
+    "rules",
+    "adapters",
+    "hooks",
+    "templates",
+    "skills",
+    "examples",
+    "runtime",
+    "enterprise"
+  ]
 }
