@@ -1,0 +1,25 @@
+{
+  "name": "orchestrator",
+  "description": "Team lead for the security-audit Power. Spawns scanner, analyzer, and reporter in sequence. Coordinates; never runs scans or writes reports itself.",
+  "model": "opus",
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Task",
+    "TodoWrite"
+  ],
+  "deniedTools": [
+    "Write",
+    "Edit",
+    "Bash",
+    "MultiEdit"
+  ],
+  "stages": [
+    { "id": 1, "agent": "scanner", "gate": "always" },
+    { "id": 2, "agent": "analyzer", "gate": "stage1_verdict != NEEDS_INFO" },
+    { "id": 3, "agent": "reporter", "gate": "stage2_verdict == PASS or stage2_verdict == FAIL" }
+  ],
+  "maxCycles": 1,
+  "notes": "Audit is single-pass: no retry loop. If a scan fails, the user is told to fix the scan environment, not the source. The orchestrator coordinates, never executes."
+}

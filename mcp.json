@@ -1,0 +1,23 @@
+{
+  "$schema": "https://kiro.dev/schemas/mcp.json",
+  "mcpServers": {
+    "jira": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-jira"],
+      "env": {
+        "JIRA_HOST": "${env:JIRA_HOST}",
+        "JIRA_EMAIL": "${env:JIRA_EMAIL}",
+        "JIRA_TOKEN": "${env:JIRA_TOKEN}"
+      },
+      "description": "Jira ticket read/write for jira-to-pr flow"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+      },
+      "description": "GitHub PR + branch ops"
+    }
+  }
+}

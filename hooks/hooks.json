@@ -1,0 +1,62 @@
+{
+  "$schema": "https://kiro.dev/schemas/hooks.json",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/pre-tool-block-destructive.js",
+            "description": "Block destructive operations: --no-verify, force-push to protected branches, writes to lockfiles/linter configs/.env*"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/post-tool-capture-diff.js",
+            "description": "Append the operation to .forge/session-log.jsonl for audit"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/session-start-load-context.js",
+            "description": "Load prior state from .forge/state.json if present, surface to orchestrator"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/pre-compact-flush-state.js",
+            "description": "Snapshot current session state to .forge/state.json before context compaction"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/session-end-snapshot.js",
+            "description": "Final state snapshot and verdict-summary to .forge/last-session.md"
+          }
+        ]
+      }
+    ]
+  }
+}

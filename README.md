@@ -1,5 +1,162 @@
-# forge-sdlc-power
+# forge-sdlc — ECC-pattern Kiro Power template
 
-ECC-pattern Kiro Power template — orchestrator + sub-agents + steering + hooks.
+A reusable template for building Kiro Powers using the [affaan-m/ecc](https://github.com/affaan-m/ecc) pattern. Built and battle-tested across the FORGE SDLC pilot (M25) and the security-audit example.
 
-See `skills/build-kiro-power/SKILL.md` for the pattern specification.
+The template gives you:
+- An **orchestrator sub-agent** that coordinates, never executes
+- **Focused sub-agents per stage**, each with a narrow `allowedTools` bundle
+- **On-demand steering** for knowledge injection (load only when relevant)
+- **Hooks for cross-cutting policy** (block destructive ops, capture audit trail, persist session state)
+- The **ECC `rules/` layer** integrated as `Always`-mode governance that every sub-agent inherits
+
+## What this is, what this isn't
+
+**This is:** the structural skeleton of a Kiro Power — file layout, agent JSON shapes, hook wiring, steering conventions, and the meta-skill that documents the pattern. You copy the structure, write the content for your domain.
+
+**This isn't:** a finished Power for a specific domain. The `forge-sdlc` Power at the repo root is the canonical example (5-stage SDLC pipeline); `examples/security-audit/` is the small-end example (3-stage audit). Both are working examples, not the template.
+
+## Quick orientation
+
+| If you want to… | Read this |
+|---|---|
+| Understand the pattern in detail | [`skills/build-kiro-power/SKILL.md`](skills/build-kiro-power/SKILL.md) |
+| See the canonical (large) example | [`POWER.md`](POWER.md) + [`.kiro/agents/`](.kiro/agents/) + [`steering/`](steering/) |
+| See the small example | [`examples/security-audit/`](examples/security-audit/) |
+| Build a new Power from this template | Copy a templates file, follow SKILL.md step by step |
+| Adopt ECC's governance rules | [`rules/`](rules/) — copy what you need into `steering/rules/` with `inclusion: always` |
+
+## File layout
+
+```
+forge-sdlc-power/
+├── POWER.md                           # canonical example frontmatter
+├── mcp.json                           # MCP server wiring (Jira, GitHub)
+├── steering/                          # SKILL.md equivalent — on-demand knowledge
+│   ├── 00-governance.md              # Always mode
+│   ├── 01-stage-patterns.md          # fileMatch — source files
+│   ├── 02-tooling-conventions.md     # fileMatch — build files
+│   ├── 03-quality-gates.md           # fileMatch — test files
+│   └── 04-security-baseline.md       # fileMatch — diffs touching any file
+├── rules/                             # ECC always-on governance layer
+│   ├── README.md
+│   ├── common/                       # language-agnostic
+│   ├── typescript/                   # TS/JS extensions
+│   └── python/                       # Python extensions
+├── .kiro/agents/                      # sub-agents — tool-bundle-per-stage
+│   ├── orchestrator.json             # team lead
+│   ├── planner.json
+│   ├── architect.json
+│   ├── implementer.json
+│   ├── validator.json                # INDEPENDENT — different model
+│   └── deployer.json
+├── hooks/                             # PreToolUse, PostToolUse, SessionStart, etc.
+│   ├── hooks.json
+│   ├── pre-tool-block-destructive.js
+│   ├── post-tool-capture-diff.js
+│   ├── session-start-load-context.js
+│   ├── pre-compact-flush-state.js
+│   ├── session-end-snapshot.js
+│   └── __tests__/                     # 20 unit tests for hook logic
+├── examples/
+│   └── security-audit/                # small-end example Power
+├── skills/
+│   └── build-kiro-power/             # meta-skill (SKILL.md)
+└── templates/                         # scaffolds to copy
+    ├── power.template.md
+    ├── orchestrator.template.json
+    ├── agent.template.json
+    ├── steering-always.template.md
+    ├── steering-ondemand.template.md
+    └── hook.template.json
+```
+
+## The three principles (from ECC, ported to Kiro)
+
+1. **Tool-bundle-per-stage.** Every sub-agent's `allowedTools` is a positive allowlist. The orchestrator cannot Edit. The implementer cannot deploy. The validator cannot modify code it validates. This is your security boundary.
+
+2. **Steering as Markdown, loaded on demand.** `00-governance.md` is `inclusion: always` (every sub-agent sees it). The rest are `inclusion: fileMatch` or `on-demand` — the harness matches the file pattern or the description to current context and only injects relevant content. Context cost is paid only for what matters.
+
+3. **Hooks for policy, not knowledge.** `PreToolUse` exit 2 blocks destructive operations at the tool layer — the orchestrator physically cannot bypass them. `PostToolUse` captures audit trails. `SessionStart` / `PreCompact` / `SessionEnd` manage state across the session lifecycle.
+
+## The orchestrator pattern
+
+The orchestrator sub-agent is the only one with `Task` in `allowedTools`. It reads `VERDICT:` lines from prior stages, decides which stage to spawn next, and chains them. It has `deniedTools: [Write, Edit, Bash, MultiEdit]` — coordination only, never execution.
+
+```
+USER TYPES "forge" or "pillar-1" or "jira-to-pr"
+       │
+       ▼
+ ┌──────────────────┐
+ │   orchestrator    │  ← knows the workflow, never does the work
+ │  allowedTools:    │
+ │  [Read, Glob,     │
+ │   Grep, Task,     │
+ │   TodoWrite]      │
+ └────────┬─────────┘
+          │ spawns (Task tool)
+          ▼
+ ┌────────────────────────────────────────────┐
+ │  planner → architect → implementer          │
+ │                              ↓              │
+ │                         validator           │
+ │                              ↓ (if PASS)    │
+ │                          deployer           │
+ └────────────────────────────────────────────┘
+```
+
+The validator uses a **different model than the implementer** (opus vs sonnet) and has no Edit/MultiEdit — this is ECC's "independent validator" principle, and it's the one rule the pattern enforces strictly.
+
+## Adopting ECC's rules layer
+
+The `rules/` directory contains the governance rules from ECC, adapted with Kiro-compatible frontmatter pointers. To wire them into a Power:
+
+```bash
+# In your Power directory
+mkdir -p steering/rules/{common,typescript,python}
+cp ../../rules/common/security.md      steering/rules/common/
+cp ../../rules/common/coding-style.md  steering/rules/common/
+cp ../../rules/common/testing.md       steering/rules/common/
+cp ../../rules/typescript/coding-style.md steering/rules/typescript/
+# ... etc
+
+# Prepend `inclusion: always` to each
+for f in steering/rules/**/*.md; do
+  if ! head -1 "$f" | grep -q "^---$"; then
+    { echo "---"; echo "inclusion: always"; echo "---"; cat "$f"; } > "$f.tmp" && mv "$f.tmp" "$f"
+  fi
+done
+```
+
+After this, every sub-agent in every stage automatically receives the security baseline, coding style, and testing rules. No stage can opt out.
+
+## Verifying a new Power
+
+Before shipping a Power built from this template, run through [`skills/build-kiro-power/SKILL.md` § "Verification before shipping"](skills/build-kiro-power/SKILL.md). The short version:
+
+- [ ] `POWER.md` frontmatter validates (name matches dir, description ≤ 30 words)
+- [ ] Every sub-agent has `deniedTools` including `Task` (except the orchestrator)
+- [ ] Every sub-agent's `writablePaths` is a positive list
+- [ ] `00-governance.md` is < 100 lines
+- [ ] `hooks/hooks.json` is valid JSON with at least `PreToolUse` registered
+- [ ] At least one rule from `rules/common/` is wired in
+- [ ] The orchestrator cannot Edit/Write/Bash (test by trying)
+- [ ] A test scenario actually flows through all stages to a verdict
+
+## Origin and pattern reference
+
+This template is a Kiro-Power adaptation of the [affaan-m/ecc](https://github.com/affaan-m/ecc) pattern, MIT-licensed. The primitives map 1:1:
+
+| ECC | Kiro Power |
+|---|---|
+| `SKILL.md` (on-demand by `description:`) | `steering/*.md` (on-demand / fileMatch) |
+| `agents/*.md` (sub-agents) | `.kiro/agents/*.json` (custom agents) |
+| `commands/*.md` (slash commands) | `POWER.md` activation keywords |
+| `hooks/hooks.json` (PreToolUse etc.) | Kiro plugin hook system |
+| `rules/` (always-follow) | `steering/rules/` with `inclusion: always` |
+
+See [`skills/build-kiro-power/SKILL.md`](skills/build-kiro-power/SKILL.md) for the full pattern specification.
+
+## License
+
+The structure, code, and original content in this repo: MIT (same as upstream ECC).
+The `rules/` directory: adapted from [affaan-m/ecc](https://github.com/affaan-m/ecc) under MIT — see individual file headers.

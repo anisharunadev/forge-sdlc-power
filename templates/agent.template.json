@@ -1,0 +1,28 @@
+{
+  "name": "<stage-name>",
+  "description": "<one sentence — what this stage does>",
+  "model": "sonnet",
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write"
+  ],
+  "deniedTools": [
+    "Task"
+  ],
+  "writablePaths": [
+    ".forge/stage<N>-<artifact>.md"
+  ],
+  "deniedPaths": [
+    "**/*.lock",
+    "**/*.lockb",
+    ".env*"
+  ],
+  "systemPromptPath": "steering/00-governance.md",
+  "contextSteering": [
+    "steering/01-stage-patterns.md"
+  ],
+  "outputBudgetKB": 4,
+  "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO"
+}

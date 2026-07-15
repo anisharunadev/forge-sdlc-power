@@ -1,0 +1,24 @@
+{
+  "name": "orchestrator",
+  "description": "Team lead for the <power-name> Power. Reads workflow state, decides which sub-agent to spawn next, parses verdict lines, and routes between stages. Coordinates; never executes stage work itself.",
+  "model": "opus",
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Task",
+    "TodoWrite"
+  ],
+  "deniedTools": [
+    "Write",
+    "Edit",
+    "Bash",
+    "MultiEdit"
+  ],
+  "stages": [
+    { "id": 1, "agent": "<stage1-name>", "gate": "always" },
+    { "id": 2, "agent": "<stage2-name>", "gate": "stage1_verdict == PASS" },
+    { "id": 3, "agent": "<stage3-name>", "gate": "stage2_verdict == PASS" }
+  ],
+  "maxCycles": 1
+}

@@ -1,0 +1,30 @@
+{
+  "name": "analyzer",
+  "description": "Stage 2 of the security-audit Power. Reads .forge/scan-raw.json, deduplicates overlapping findings, scores severity, and writes .forge/scan-analyzed.json. No source access — only the raw findings.",
+  "model": "opus",
+  "allowedTools": [
+    "Read",
+    "Write"
+  ],
+  "deniedTools": [
+    "Edit",
+    "MultiEdit",
+    "Bash",
+    "Glob",
+    "Grep",
+    "Task"
+  ],
+  "writablePaths": [
+    ".forge/scan-analyzed.json"
+  ],
+  "readablePaths": [
+    ".forge/scan-raw.json"
+  ],
+  "systemPromptPath": "steering/00-governance.md",
+  "contextSteering": [
+    "steering/01-audit-scope.md"
+  ],
+  "outputBudgetKB": 8,
+  "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO\nFINDINGS: <count>\nSEVERITY: <none|low|medium|high|critical>",
+  "notes": "THE TIGHTEST allowedTools in the entire pattern. The analyzer literally cannot read source code — only the raw findings file. This is on purpose: deduplication is purely a data operation, not a code review."
+}

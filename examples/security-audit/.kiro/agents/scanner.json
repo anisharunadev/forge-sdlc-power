@@ -1,0 +1,37 @@
+{
+  "name": "scanner",
+  "description": "Stage 1 of the security-audit Power. Runs SAST tools (semgrep, detect-secrets, dependency audits) and writes raw findings to .forge/scan-raw.json. Read-only on source.",
+  "model": "sonnet",
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Bash",
+    "Write"
+  ],
+  "deniedTools": [
+    "Edit",
+    "MultiEdit",
+    "Task"
+  ],
+  "writablePaths": [
+    ".forge/scan-raw.json"
+  ],
+  "systemPromptPath": "steering/00-governance.md",
+  "contextSteering": [
+    "steering/01-audit-scope.md"
+  ],
+  "outputBudgetKB": 8,
+  "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO\nFINDINGS: <count>\nSEVERITY: <none|low|medium|high|critical>",
+  "bashAllowlist": [
+    "semgrep",
+    "detect-secrets",
+    "npm audit",
+    "pip-audit",
+    "gitleaks",
+    "trivy",
+    "command -v",
+    "which"
+  ],
+  "notes": "Read-only on source. Writes ONLY to .forge/scan-raw.json. Picks tools based on what's installed, never assumes."
+}

@@ -1,0 +1,10 @@
+{
+  "name": "forge-sdlc-hooks",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Hook scripts for the forge-sdlc Kiro Power. No runtime dependencies — pure Node stdlib.",
+  "main": "hooks.json",
+  "scripts": {
+    "test": "node --test hooks/__tests__/*.test.js"
+  }
+}

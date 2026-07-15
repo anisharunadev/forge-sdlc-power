@@ -1,0 +1,53 @@
+{
+  "name": "implementer",
+  "description": "Stage 3 of the forge-sdlc pipeline. Reads the ADR, implements the change, writes tests, and produces a clean diff. The hook layer (PreToolUse) enforces that lockfiles, linter configs, and .env* cannot be edited.",
+  "model": "sonnet",
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write",
+    "Edit",
+    "MultiEdit",
+    "Bash"
+  ],
+  "deniedTools": [
+    "Task"
+  ],
+  "writablePaths": [
+    "src/",
+    "app/",
+    "lib/",
+    "tests/",
+    "test/",
+    "**/*.test.{ts,tsx,js,jsx,py}",
+    "**/*.spec.{ts,tsx,js,jsx,py}",
+    ".forge/stage3-diff.diff",
+    ".forge/tech-debt.md"
+  ],
+  "deniedPaths": [
+    "**/*.lock",
+    "**/*.lockb",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "yarn.lock",
+    "uv.lock",
+    "poetry.lock",
+    "Cargo.lock",
+    "go.sum",
+    ".env*",
+    "**/.eslintrc*",
+    "biome.json",
+    ".prettierrc*",
+    ".ruff.toml",
+    "tsconfig.json"
+  ],
+  "systemPromptPath": "steering/00-governance.md",
+  "contextSteering": [
+    "steering/01-stage-patterns.md",
+    "steering/02-tooling-conventions.md"
+  ],
+  "outputBudgetKB": 4,
+  "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
+  "notes": "May NOT spawn sub-agents. May NOT touch tooling/config files (deniedPaths + hook enforces). May NOT push or deploy — that's the deployer's job."
+}

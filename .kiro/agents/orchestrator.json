@@ -1,0 +1,28 @@
+{
+  "name": "orchestrator",
+  "description": "Team lead for the forge-sdlc pipeline. Reads workflow state, decides which sub-agent to spawn next, parses verdict lines, and routes between stages. Coordinates; never executes stage work itself.",
+  "model": "opus",
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Task",
+    "TodoWrite"
+  ],
+  "deniedTools": [
+    "Write",
+    "Edit",
+    "Bash",
+    "MultiEdit"
+  ],
+  "systemPromptPath": "steering/00-governance.md",
+  "stages": [
+    { "id": 1, "agent": "planner", "gate": "always" },
+    { "id": 2, "agent": "architect", "gate": "stage1_verdict == PASS" },
+    { "id": 3, "agent": "implementer", "gate": "stage2_verdict == PASS" },
+    { "id": 4, "agent": "validator", "gate": "stage3_verdict == PASS" },
+    { "id": 5, "agent": "deployer", "gate": "stage4_verdict == PASS" }
+  ],
+  "maxCycles": 3,
+  "notes": "allowedTools deliberately excludes Write/Edit/Bash — the orchestrator coordinates via Task spawn, never edits files itself. If a stage needs a file written, that file's owner is the relevant sub-agent."
+}

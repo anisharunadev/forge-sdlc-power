@@ -1,0 +1,28 @@
+{
+  "name": "architect",
+  "description": "Stage 2 of the forge-sdlc pipeline. Reads the planner's plan, makes design decisions, and writes an Architecture Decision Record (ADR). No code edits — only design docs.",
+  "model": "opus",
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write"
+  ],
+  "deniedTools": [
+    "Edit",
+    "Bash",
+    "Task",
+    "MultiEdit"
+  ],
+  "writablePaths": [
+    "docs/adr/",
+    ".forge/stage2-adr.md"
+  ],
+  "systemPromptPath": "steering/00-governance.md",
+  "contextSteering": [
+    "steering/01-stage-patterns.md"
+  ],
+  "outputBudgetKB": 4,
+  "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
+  "notes": "Writes ADRs (docs/adr/0001-*.md) and the stage handoff (.forge/stage2-adr.md). No source code edits."
+}

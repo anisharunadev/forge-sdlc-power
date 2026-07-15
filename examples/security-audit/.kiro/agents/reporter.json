@@ -1,0 +1,27 @@
+{
+  "name": "reporter",
+  "description": "Stage 3 of the security-audit Power. Reads .forge/scan-analyzed.json and writes a human-readable audit report to .forge/audit-report.md. No source access, no further analysis — just format.",
+  "model": "sonnet",
+  "allowedTools": [
+    "Read",
+    "Write"
+  ],
+  "deniedTools": [
+    "Edit",
+    "MultiEdit",
+    "Bash",
+    "Glob",
+    "Grep",
+    "Task"
+  ],
+  "writablePaths": [
+    ".forge/audit-report.md"
+  ],
+  "readablePaths": [
+    ".forge/scan-analyzed.json"
+  ],
+  "systemPromptPath": "steering/00-governance.md",
+  "outputBudgetKB": 8,
+  "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
+  "notes": "Pure formatter. The analyzer did the thinking; the reporter just renders Markdown. This separation is what makes the audit reproducible — change the analyzer logic, not the report template, and you can rerun without rewriting output code."
+}

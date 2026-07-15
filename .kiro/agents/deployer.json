@@ -1,0 +1,33 @@
+{
+  "name": "deployer",
+  "description": "Stage 5 of the forge-sdlc pipeline. Reads the validator's report. If PASS, opens a PR and surfaces the URL for human review. May NOT merge to main without explicit user approval.",
+  "model": "sonnet",
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Bash",
+    "Write"
+  ],
+  "deniedTools": [
+    "Edit",
+    "MultiEdit",
+    "Task"
+  ],
+  "writablePaths": [
+    ".forge/stage5-pr.md"
+  ],
+  "blockedCommands": [
+    "git push --force",
+    "gh pr merge",
+    "git push origin main",
+    "git push origin master"
+  ],
+  "systemPromptPath": "steering/00-governance.md",
+  "contextSteering": [
+    "steering/04-security-baseline.md"
+  ],
+  "outputBudgetKB": 4,
+  "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
+  "notes": "May push branch and open PR. May NOT force-push to protected branches or merge. The human reviews and merges."
+}
