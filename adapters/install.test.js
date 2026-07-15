@@ -205,3 +205,142 @@ test('--status shows registry state', () => {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
+
+// ponytail: Bug A regression — apply() with missing env vars should auto-disable
+// the adapter (not silently skip). The registry must reflect reality so doctor /
+// --status don't lie about which adapters are wired.
+test('apply() auto-disables adapter when required env vars are missing', () => {
+  const tmp = setupTmp();
+  try {
+    // GitHub env is missing → expect github to be auto-disabled.
+    const env = {
+      JIRA_HOST: 'test.atlassian.net',
+      JIRA_EMAIL: 'bot@test.com',
+      JIRA_TOKEN: 'token',
+      // GITHUB_TOKEN deliberately omitted
+    };
+    const r = run([], tmp, env);
+    assert.strictEqual(r.status, 0, `apply should self-heal (exit 0), got ${r.status}: ${r.stderr}`);
+
+    // Registry should now show github disabled with a reason.
+    const reg = JSON.parse(fs.readFileSync(path.join(tmp, 'adapters/registry.json'), 'utf8'));
+    assert.strictEqual(reg.adapters.github.enabled, false, 'github should be auto-disabled');
+    assert.match(reg.adapters.github.reason, /missing env vars.*GITHUB_TOKEN/);
+    assert.strictEqual(reg.adapters.github.installedAt, undefined, 'installedAt cleared on disable');
+
+    // MCP merge should drop github from mcp.json; jira stays.
+    const rootMcp = JSON.parse(fs.readFileSync(path.join(tmp, 'mcp.json'), 'utf8'));
+    assert.ok(!rootMcp.mcpServers.github, 'github server should NOT be in merged mcp.json');
+    assert.ok(rootMcp.mcpServers.jira, 'jira server should still be in merged mcp.json');
+
+    // Stderr should mention the auto-disable path.
+    assert.match(r.stderr, /auto-disabling "github"/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('--root writes project artifacts to a different directory', () => {
+  const tmp = setupTmp();
+  const proj = fs.mkdtempSync(path.join(os.tmpdir(), 'forge-proj-'));
+  try {
+    const env = {
+      JIRA_HOST: 'test.atlassian.net',
+      JIRA_EMAIL: 'bot@test.com',
+      JIRA_TOKEN: 'token',
+      GITHUB_TOKEN: 'ghp_test',
+    };
+    // --root=proj needs the project-side scaffolds to exist (install reads them).
+    // Mirror the agent files + steering dir into proj so install can find them.
+    const copyFromTmp = (rel) => {
+      const src = path.join(tmp, rel);
+      const dst = path.join(proj, rel);
+      fs.mkdirSync(path.dirname(dst), { recursive: true });
+      if (fs.statSync(src).isDirectory()) {
+        fs.mkdirSync(dst, { recursive: true });
+      } else {
+        fs.copyFileSync(src, dst);
+      }
+    };
+    for (const f of ['mcp.json', '.kiro/agents/orchestrator.json', 'steering']) {
+      copyFromTmp(f);
+    }
+    // Each stage agent so the tool-update loop has targets.
+    for (const stage of ['planner', 'architect', 'implementer', 'validator', 'deployer']) {
+      copyFromTmp(`.kiro/agents/${stage}.json`);
+    }
+
+    const r = run(['--root', proj], tmp, env);
+    assert.strictEqual(r.status, 0, `install failed: ${r.stderr}`);
+
+    // Project-side files should be in proj.
+    assert.ok(fs.existsSync(path.join(proj, 'mcp.json')), 'mcp.json should land in --root');
+    assert.ok(fs.existsSync(path.join(proj, '.kiro/agents/orchestrator.json')), 'agents should land in --root');
+
+    // Package-side artifacts (registry.json, adapters/) still live in tmp.
+    assert.ok(fs.existsSync(path.join(tmp, 'adapters/registry.json')));
+
+    // The merged mcp.json (in --root) should have both servers — confirms install
+    // wrote to --root, not cwd. The orchestrator.json in proj should also be a
+    // valid JSON with allowedTools updated to include the ticket-system tool.
+    const rootMcp = JSON.parse(fs.readFileSync(path.join(proj, 'mcp.json'), 'utf8'));
+    assert.ok(rootMcp.mcpServers.jira, 'jira should be in --root mcp.json');
+    assert.ok(rootMcp.mcpServers.github, 'github should be in --root mcp.json');
+    const orch = JSON.parse(fs.readFileSync(path.join(proj, '.kiro/agents/orchestrator.json'), 'utf8'));
+    assert.ok(orch.allowedTools.includes('jira_post_status_update'), 'orchestrator should be updated in --root');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+    fs.rmSync(proj, { recursive: true, force: true });
+  }
+});
+
+// ponytail: regression — install on a fresh project without .kiro/agents/ should
+// skip CI generation with a clear log, not surface the generator's uncaught throw.
+test('apply() skips CI generation when orchestrator.json is missing', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'forge-noagents-'));
+  try {
+    // Copy everything an install needs EXCEPT .kiro/agents/.
+    const copy = (rel) => {
+      const src = path.join(REPO, rel);
+      const dst = path.join(tmp, rel);
+      fs.mkdirSync(path.dirname(dst), { recursive: true });
+      fs.copyFileSync(src, dst);
+    };
+    copy('mcp.json');
+    copy('adapters/registry.json');
+    copy('adapters/adapter.schema.json');
+    // Mirror the real bug scenario: package ships with enterprise/ci/generate.js
+    // (it's in npm cache for npx installs) but the target project has no
+    // .kiro/agents/. Copy just the generator entry point.
+    fs.mkdirSync(path.join(tmp, 'enterprise', 'ci'), { recursive: true });
+    copy('enterprise/ci/generate.js');
+    for (const a of ['jira', 'github']) {
+      fs.mkdirSync(path.join(tmp, 'adapters', a), { recursive: true });
+      copy(`adapters/${a}/adapter.json`);
+      copy(`adapters/${a}/mcp.json`);
+      fs.mkdirSync(path.join(tmp, 'adapters', a, 'steering'), { recursive: true });
+      copy(`adapters/${a}/steering/usage.md`);
+    }
+    fs.mkdirSync(path.join(tmp, 'steering'), { recursive: true });
+
+    const env = {
+      JIRA_HOST: 'test.atlassian.net',
+      JIRA_EMAIL: 'bot@test.com',
+      JIRA_TOKEN: 'token',
+      GITHUB_TOKEN: 'ghp_test',
+    };
+    const r = run([], tmp, env);
+    assert.strictEqual(r.status, 0, `install should self-heal, got ${r.status}: ${r.stderr}`);
+
+    // Should mention CI skip, NOT the generator's uncaught throw.
+    assert.match(r.stdout + r.stderr, /CI skipped/);
+    // Stack-trace markers from generate.js's throw — `at loadOrchestrator` and
+    // `generate.js:NN` only appear when the generator ran and threw.
+    assert.ok(!/at loadOrchestrator/.test(r.stdout + r.stderr),
+      'should not surface generator stack trace');
+    assert.ok(!/enterprise\/ci\/generate\.js:\d+/.test(r.stdout + r.stderr),
+      'should not surface generator stack trace');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});

@@ -528,6 +528,15 @@ function generateCI() {
   );
   const GENERATOR = path.join(ROOT, 'enterprise/ci/generate.js');
   if (!fs.existsSync(GENERATOR)) return; // ci feature not installed
+  // ponytail: the generator hard-throws if orchestrator.json is absent; CI is a
+  // nice-to-have on top of the agent wiring, not a prerequisite. Same warn+skip
+  // pattern as updateAgentAllowedTools() — user without agents gets a clear log,
+  // not a stack trace.
+  const orchFile = path.join(PROJECT_ROOT, '.kiro', 'agents', 'orchestrator.json');
+  if (!fs.existsSync(orchFile)) {
+    console.log(`[install] CI skipped: ${orchFile} not found (run \`forge-sdlc-agent init-agents\` or copy .kiro/agents/ from the package to enable CI generation)`);
+    return;
+  }
   const r = spawnSync(process.execPath, [GENERATOR, '--target', ciTarget, '-o', ciOutput], {
     encoding: 'utf8',
     cwd: PROJECT_ROOT,
