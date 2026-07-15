@@ -2,7 +2,7 @@
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "args": ["-y", "@upstash/context7-mcp@3.2.3"],
       "description": "Context7 MCP — live library documentation. Tools: context7_resolve_library_id, context7_query_docs. No API key required for basic use."
     }
   }

@@ -42,6 +42,11 @@ function setupTmp() {
   copy('adapters/github/mcp.json');
   fs.mkdirSync(path.join(tmp, 'adapters', 'github', 'steering'), { recursive: true });
   copy('adapters/github/steering/usage.md');
+  fs.mkdirSync(path.join(tmp, 'adapters', 'clickup'), { recursive: true });
+  copy('adapters/clickup/adapter.json');
+  copy('adapters/clickup/mcp.json');
+  fs.mkdirSync(path.join(tmp, 'adapters', 'clickup', 'steering'), { recursive: true });
+  copy('adapters/clickup/steering/usage.md');
   // Need steering dir
   fs.mkdirSync(path.join(tmp, 'steering'), { recursive: true });
   return tmp;
@@ -139,6 +144,49 @@ test('refuses to enable adapter when env vars missing', () => {
     const r = run(['--enable', 'jira'], tmp, null);
     assert.notStrictEqual(r.status, 0, `should fail when env vars missing, got status ${r.status}: ${r.stderr}`);
     assert.match(r.stderr, /env vars missing/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('orchestrator post_status_update tool swaps with enabled ticket system', () => {
+  const tmp = setupTmp();
+  try {
+    const orchPath = path.join(tmp, '.kiro/agents/orchestrator.json');
+    const orchTools = () => new Set(JSON.parse(fs.readFileSync(orchPath, 'utf8')).allowedTools);
+    // Env for every adapter that may be enabled during this test.
+    const env = {
+      JIRA_HOST: 'test.atlassian.net',
+      JIRA_EMAIL: 'bot@test.com',
+      JIRA_TOKEN: 'token',
+      GITHUB_TOKEN: 'ghp_test',
+      CLICKUP_API_TOKEN: 'ck_test',
+      CLICKUP_TEAM_ID: '123',
+    };
+
+    // 1. Initial: jira only → jira tool present, clickup absent
+    assert.strictEqual(run([], tmp, env).status, 0);
+    let tools = orchTools();
+    assert.ok(tools.has('jira_post_status_update'), 'jira tool present initially');
+    assert.ok(!tools.has('clickup_post_status_update'), 'clickup tool absent initially');
+
+    // 2. Enable clickup → both present
+    assert.strictEqual(run(['--enable', 'clickup'], tmp, env).status, 0);
+    tools = orchTools();
+    assert.ok(tools.has('jira_post_status_update'), 'jira tool still present');
+    assert.ok(tools.has('clickup_post_status_update'), 'clickup tool added');
+
+    // 3. Disable jira → only clickup
+    assert.strictEqual(run(['--disable', 'jira'], tmp, env).status, 0);
+    tools = orchTools();
+    assert.ok(!tools.has('jira_post_status_update'), 'jira tool removed');
+    assert.ok(tools.has('clickup_post_status_update'), 'clickup tool remains');
+
+    // 4. Disable both → neither
+    assert.strictEqual(run(['--disable', 'clickup'], tmp, env).status, 0);
+    tools = orchTools();
+    assert.ok(!tools.has('jira_post_status_update'), 'jira tool absent');
+    assert.ok(!tools.has('clickup_post_status_update'), 'clickup tool absent');
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

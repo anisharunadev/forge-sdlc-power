@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-jira"
+        "@modelcontextprotocol/server-jira@latest"
       ],
       "env": {
         "JIRA_HOST": "${env:JIRA_HOST}",
@@ -17,7 +17,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-github"
+        "@modelcontextprotocol/server-github@2025.4.8"
       ],
       "env": {
         "GITHUB_TOKEN": "${env:GITHUB_TOKEN}",
@@ -29,7 +29,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@upstash/context7-mcp@latest"
+        "@upstash/context7-mcp@3.2.3"
       ],
       "description": "Context7 MCP — live library documentation. Tools: context7_resolve_library_id, context7_query_docs. No API key required for basic use."
     }

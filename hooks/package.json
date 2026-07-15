@@ -5,6 +5,6 @@
   "description": "Hook scripts for the forge-sdlc Kiro Power. No runtime dependencies — pure Node stdlib.",
   "main": "hooks.json",
   "scripts": {
-    "test": "node --test hooks/__tests__/*.test.js"
+    "test": "node --test __tests__/*.test.js"
   }
 }

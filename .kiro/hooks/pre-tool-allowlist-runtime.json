@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "pre-tool-allowlist-runtime",
+      "trigger": "PreToolUse",
+      "matcher": "^Bash$",
+      "action": {
+        "type": "command",
+        "command": "node hooks/pre-tool-allowlist-runtime.js"
+      },
+      "timeout": 30,
+      "enabled": true,
+      "description": "Enforce allowlist-by-script: the orchestrator may only run the scripts listed in orchestrator.json runtime.*.command. Runs before the destructive blocker so allowed scripts pass, then destructive patterns are still checked."
+    }
+  ]
+}

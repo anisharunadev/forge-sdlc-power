@@ -71,7 +71,7 @@ forge-sdlc-power/
 │   ├── session-start-load-context.js
 │   ├── pre-compact-flush-state.js
 │   ├── session-end-snapshot.js
-│   └── __tests__/                     # 20 unit tests for hook logic
+│   └── __tests__/                     # 26 unit tests for hook logic
 ├── examples/
 │   └── security-audit/                # small-end example Power
 ├── skills/

@@ -104,11 +104,11 @@
       "description": "A separate long-lived process that drains the ticket queue. Not part of the orchestrator's per-ticket flow."
     },
     "postStage": {
-      "_comment": "Already wired via hooks/post-stage-cmd.js. Listed here for completeness.",
+      "_comment": "Already wired via .kiro/hooks/post-stage-cmd.json. Listed here for completeness.",
       "trigger": "after_every_stage",
-      "command": "see hooks/post-stage-cmd.js",
+      "command": "see .kiro/hooks/post-stage-cmd.json",
       "description": "Writes .forge/post-stage-prompt.json with the humanized status update."
     }
   },
-  "notes": "allowedTools deliberately excludes Write/Edit/Bash for general use. The runtime integration is gated by the host environment: the orchestrator's host grants Bash for the specific scripts listed in `runtime.*.command` (via the hook layer or the install script), even though the manifest denies it broadly. This is the security pattern: deny-by-default, allowlist-by-script."
+  "notes": "allowedTools deliberately excludes Write/Edit/Bash for general use. The allowlist-by-script pattern is ENFORCED by hooks/pre-tool-allowlist-runtime.js (wired in .kiro/hooks/pre-tool-allowlist-runtime.json as the first PreToolUse Bash hook): it allows only bash commands starting with one of the scripts listed in `runtime.*.command` and blocks (exit 2) everything else. The destructive-pattern blocker runs after it. This is the security pattern: deny-by-default, allowlist-by-script — enforced at the hook layer, not merely by host convention. Keep the ALLOWED_SCRIPTS list in that hook in sync with the runtime.* commands here."
 }

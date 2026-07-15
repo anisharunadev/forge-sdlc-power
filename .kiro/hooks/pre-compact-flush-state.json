@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "pre-compact-flush-state",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "node hooks/pre-compact-flush-state.js"
+      },
+      "timeout": 30,
+      "enabled": true,
+      "description": "Snapshot current session state to .forge/state.json. Originally a PreCompact hook (pre-v3); v3 has no PreCompact trigger, so it now fires at session end instead of before each compaction. Ponytail: a future PostCompaction trigger would restore mid-session snapshots; until then this is best-effort end-of-session flush only."
+    }
+  ]
+}

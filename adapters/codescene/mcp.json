@@ -2,7 +2,7 @@
   "mcpServers": {
     "codescene": {
       "command": "npx",
-      "args": ["-y", "@codescene/codehealth-mcp"],
+      "args": ["-y", "@codescene/codehealth-mcp@1.4.0"],
       "env": {
         "CS_ACCESS_TOKEN": "${env:CS_ACCESS_TOKEN}"
       },

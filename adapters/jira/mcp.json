@@ -2,7 +2,7 @@
   "mcpServers": {
     "jira": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-jira"],
+      "args": ["-y", "@modelcontextprotocol/server-jira@latest"],
       "env": {
         "JIRA_HOST": "${env:JIRA_HOST}",
         "JIRA_EMAIL": "${env:JIRA_EMAIL}",

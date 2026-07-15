@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "pre-stage-gate",
+      "trigger": "PreToolUse",
+      "matcher": "^Task$",
+      "action": {
+        "type": "command",
+        "command": "node hooks/pre-stage-gate.js"
+      },
+      "timeout": 30,
+      "enabled": true,
+      "description": "Refuse the very first Task spawn if preflight reports NOT_READY. Gated by FORGE_FIRST_INVOCATION=1 (set by the host on the first Task, unset after)."
+    }
+  ]
+}

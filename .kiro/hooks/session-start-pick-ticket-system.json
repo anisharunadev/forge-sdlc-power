@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "session-start-pick-ticket-system",
+      "trigger": "SessionStart",
+      "action": {
+        "type": "command",
+        "command": "node hooks/session-start-pick-ticket-system.js"
+      },
+      "timeout": 30,
+      "enabled": true,
+      "description": "Read .forge/ticket-system.json and surface to orchestrator: which ticket system (jira/clickup/none) is configured for this session"
+    }
+  ]
+}

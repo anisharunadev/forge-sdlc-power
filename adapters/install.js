@@ -201,6 +201,61 @@ function updateAgentAllowedTools() {
   }
 }
 
+// ---------- orchestrator ticket-system tool swap ----------
+//
+// A ticket-system adapter is any adapter exposing a tool whose name ends in
+// `_post_status_update` (jira_post_status_update, clickup_post_status_update, …).
+// The orchestrator may only ever hold the post_status_update tool of ENABLED
+// ticket systems. updateAgentAllowedTools() is additive-only, so without this
+// a swap (enable clickup, disable jira) leaves the stale jira tool behind and
+// never removes it. This function reconciles: add for enabled, remove for
+// disabled.
+
+const POST_STATUS_RE = /_post_status_update$/;
+
+// Returns [{ name, tool, enabled }] for every adapter that has a post_status_update tool.
+function ticketSystemAdapters(reg) {
+  const out = [];
+  for (const [name, entry] of Object.entries(reg.adapters)) {
+    const loaded = loadAdapter(name);
+    if (!loaded) continue;
+    const statusTool = (loaded.manifest.tools || []).find((t) => POST_STATUS_RE.test(t.name));
+    if (!statusTool) continue;
+    out.push({ name, tool: statusTool, enabled: !!entry.enabled, manifest: loaded.manifest });
+  }
+  return out;
+}
+
+function updateOrchestratorTicketTool() {
+  const reg = loadRegistry();
+  const orchFile = path.join(AGENTS_DIR, 'orchestrator.json');
+  if (!fs.existsSync(orchFile)) return;
+  const orch = JSON.parse(fs.readFileSync(orchFile, 'utf8'));
+  const allowed = new Set(orch.allowedTools || []);
+  let changed = false;
+
+  for (const { name, tool, enabled, manifest } of ticketSystemAdapters(reg)) {
+    if (enabled) {
+      if (!allowed.has(tool.name)) { allowed.add(tool.name); changed = true; }
+    } else {
+      if (allowed.has(tool.name)) { allowed.delete(tool.name); changed = true; }
+      // ponytail: only manage the post_status_update tool; warn (don't touch) if a
+      // disabled ticket system left other tools on the orchestrator.
+      const stale = (manifest.tools || [])
+        .filter((t) => t.name !== tool.name && allowed.has(t.name));
+      if (stale.length) {
+        console.warn(`[install] disabled ticket-system "${name}" still has non-status tools in orchestrator allowedTools: ${stale.map((t) => t.name).join(', ')} — leaving them (only post_status_update is managed here)`);
+      }
+    }
+  }
+
+  if (changed) {
+    orch.allowedTools = [...allowed].sort();
+    fs.writeFileSync(orchFile, JSON.stringify(orch, null, 2) + '\n');
+    console.log('[install] reconciled orchestrator ticket-system tool(s)');
+  }
+}
+
 // ---------- steering symlink ----------
 
 function linkAdapterSteering() {
@@ -342,6 +397,7 @@ function cmdVerifyAll() {
 function apply() {
   mergeMcp();
   updateAgentAllowedTools();
+  updateOrchestratorTicketTool();
   linkAdapterSteering();
   applyStageAdditions();
   writeTicketSystemConfig();

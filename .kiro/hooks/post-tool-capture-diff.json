@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "post-tool-capture-diff",
+      "trigger": "PostToolUse",
+      "matcher": "^Bash$|^Write$|^Edit$|^MultiEdit$",
+      "action": {
+        "type": "command",
+        "command": "node hooks/post-tool-capture-diff.js"
+      },
+      "timeout": 30,
+      "enabled": true,
+      "description": "Append the operation to .forge/session-log.jsonl for audit"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "session-start-load-context",
+      "trigger": "SessionStart",
+      "action": {
+        "type": "command",
+        "command": "node hooks/session-start-load-context.js"
+      },
+      "timeout": 30,
+      "enabled": true,
+      "description": "Load prior state from .forge/state.json if present, surface to orchestrator"
+    }
+  ]
+}

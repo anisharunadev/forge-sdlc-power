@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "post-stage-cmd",
+      "trigger": "PostToolUse",
+      "matcher": "^Task$",
+      "action": {
+        "type": "command",
+        "command": "node hooks/post-stage-cmd.js"
+      },
+      "timeout": 30,
+      "enabled": true,
+      "description": "After a sub-agent Task completes, write a humanized status-update prompt to .forge/post-stage-prompt.json. The orchestrator picks it up and calls jira_post_status_update (or clickup equivalent) on the next turn."
+    }
+  ]
+}

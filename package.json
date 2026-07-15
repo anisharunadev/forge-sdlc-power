@@ -1,0 +1,12 @@
+{
+  "name": "forge-sdlc-power",
+  "version": "2.1.0",
+  "private": true,
+  "description": "Standard-pattern Kiro Power template with orchestrator, adapters, and enterprise runtime.",
+  "scripts": {
+    "test": "node --test hooks/__tests__/*.test.js enterprise/*/*.test.js runtime/integration.test.js adapters/install.test.js",
+    "test:hooks": "cd hooks && npm test",
+    "bootstrap": "npm install --no-save @modelcontextprotocol/server-jira@latest @modelcontextprotocol/server-github@latest @upstash/context7-mcp@latest",
+    "verify": "node adapters/install.js --verify"
+  }
+}

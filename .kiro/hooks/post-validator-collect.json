@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "post-validator-collect",
+      "trigger": "PostToolUse",
+      "matcher": "^Task$",
+      "action": {
+        "type": "command",
+        "command": "node hooks/post-validator-collect.js"
+      },
+      "timeout": 60,
+      "enabled": true,
+      "description": "After the validator sub-agent finishes, run the project's tests and write the diff to .forge/test-diff.json. The orchestrator includes this in the humanized status update."
+    }
+  ]
+}
