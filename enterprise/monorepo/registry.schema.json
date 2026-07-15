@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "forge-sdlc monorepo registry",
+  "description": "Schema for the multi-repo registry file (.forge/monorepo.json). Each repo in a brownfield setup declares its location, role in the dependency graph, owner, and per-repo config.",
+  "type": "object",
+  "required": ["repos"],
+  "properties": {
+    "defaultBranch": {
+      "type": "string",
+      "description": "Default branch to merge into. Defaults to 'main' if not set."
+    },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "path", "role"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Short identifier, kebab-case. Used in branch names and PR titles."
+          },
+          "path": {
+            "type": "string",
+            "description": "Filesystem path to the repo, relative to the monorepo root (this repo's root)."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["primary", "consumer", "shared-types", "infra"],
+            "description": "primary = the repo where the main change lives. consumer = repos that import from the primary. shared-types = the type definitions. infra = deploy / CI / config repos."
+          },
+          "owner": {
+            "type": "string",
+            "description": "GitHub team or user that owns the repo. Used for auto-assignment and CODEOWNERS lookup."
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Names of other repos in the registry this repo depends on. Used to determine build order."
+          },
+          "prStrategy": {
+            "type": "string",
+            "enum": ["branch", "fork"],
+            "default": "branch",
+            "description": "How PRs are opened. branch = in-repo branch. fork = cross-repo fork PR."
+          },
+          "forbiddenPaths": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Per-repo path patterns that should not be edited by the implementer. In addition to the global ones (lockfiles, linter configs, .env*)."
+          },
+          "conventions": {
+            "type": "string",
+            "description": "Path to a markdown file with per-repo conventions. The architect reads this before designing changes that touch this repo."
+          }
+        }
+      }
+    }
+  }
+}

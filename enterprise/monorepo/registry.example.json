@@ -1,0 +1,46 @@
+{
+  "defaultBranch": "main",
+  "repos": [
+    {
+      "name": "api",
+      "path": "../api",
+      "role": "primary",
+      "owner": "platform-team",
+      "prStrategy": "branch"
+    },
+    {
+      "name": "shared-types",
+      "path": "../shared-types",
+      "role": "shared-types",
+      "owner": "platform-team",
+      "dependsOn": [],
+      "prStrategy": "branch"
+    },
+    {
+      "name": "web",
+      "path": "../web",
+      "role": "consumer",
+      "owner": "frontend-team",
+      "dependsOn": ["api", "shared-types"],
+      "prStrategy": "branch",
+      "conventions": "./conventions/web.md"
+    },
+    {
+      "name": "mobile",
+      "path": "../mobile",
+      "role": "consumer",
+      "owner": "mobile-team",
+      "dependsOn": ["api", "shared-types"],
+      "prStrategy": "branch"
+    },
+    {
+      "name": "infra",
+      "path": "../infra",
+      "role": "infra",
+      "owner": "platform-team",
+      "dependsOn": ["api"],
+      "prStrategy": "branch",
+      "forbiddenPaths": ["terraform/prod/**", "k8s/prod/**"]
+    }
+  ]
+}
