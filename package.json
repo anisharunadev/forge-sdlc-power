@@ -1,12 +1,18 @@
 {
-  "name": "forge-sdlc-power",
-  "version": "2.1.0",
+  "name": "forge-sdlc-agent",
+  "version": "2.2.0",
   "private": true,
-  "description": "Standard-pattern Kiro Power template with orchestrator, adapters, and enterprise runtime.",
+  "description": "CLI control plane for the FORGE SDLC Power — interactive install, state machine v2, continuous memory v2, resume/restart.",
+  "bin": {
+    "forge-sdlc-agent": "bin/forge-sdlc-agent.js"
+  },
   "scripts": {
-    "test": "node --test hooks/__tests__/*.test.js enterprise/*/*.test.js runtime/integration.test.js adapters/install.test.js",
+    "test": "node --test hooks/__tests__/*.test.js enterprise/*/*.test.js runtime/integration.test.js adapters/install.test.js bin/lib/*.test.js",
+    "test:cli": "node --test bin/lib/*.test.js",
     "test:hooks": "cd hooks && npm test",
     "bootstrap": "npm install --no-save @modelcontextprotocol/server-jira@latest @modelcontextprotocol/server-github@latest @upstash/context7-mcp@latest",
-    "verify": "node adapters/install.js --verify"
-  }
+    "verify": "node adapters/install.js --verify",
+    "start": "node bin/forge-sdlc-agent.js"
+  },
+  "files": ["bin", "POWER.md", "README.md", "mcp.json", ".kiro", "steering", "rules", "adapters", "hooks", "templates", "skills", "examples", "runtime", "enterprise"]
 }
