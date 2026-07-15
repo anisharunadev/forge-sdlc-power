@@ -146,6 +146,8 @@ Minimum viable rules for a new Power:
 - `rules/common/testing.md` (if the Power writes code with tests)
 - `rules/<language>/coding-style.md` + `patterns.md` (language-specific)
 
+Available language layers staged in this repo: `common/`, `typescript/`, `python/`, `php/`. ECC upstream has 20+ more (golang, rust, java, kotlin, swift, ruby, react, vue, angular, nuxt, react-native, web, cpp, csharp, dart, fsharp, perl, arkts). To add one, fetch from `https://raw.githubusercontent.com/affaan-m/ecc/main/rules/<language>/<filename>` and stage under `rules/<language>/` with the same `> Adapted for Kiro Power` header.
+
 Wire them up by symlinking or copying:
 
 ```bash

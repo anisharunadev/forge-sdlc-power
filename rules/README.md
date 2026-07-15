@@ -8,8 +8,22 @@ This directory contains the always-on governance rules inherited from ECC
 - `common/` — language-agnostic principles (coding style, security, testing, git, performance, patterns, hooks, agents)
 - `typescript/` — TypeScript / JavaScript-specific extensions of common
 - `python/` — Python-specific extensions of common
+- `php/` — PHP-specific extensions of common (PSR-12, PHPUnit/Pest, etc.)
 
 Each language-specific file references its common counterpart and overrides defaults where idioms differ.
+
+## Available languages (and how to add more)
+
+Currently staged:
+
+| Language | Files | Status |
+|---|---|---|
+| common | 8 | always available |
+| typescript | 4 | staged |
+| python | 4 | staged |
+| php | 4 | staged |
+
+ECC upstream has 20+ more language directories (golang, rust, java, kotlin, swift, ruby, react, vue, angular, nuxt, react-native, web, cpp, csharp, dart, fsharp, perl, arkts). To add one, fetch from `https://raw.githubusercontent.com/affaan-m/ecc/main/rules/<language>/<filename>` and stage under `rules/<language>/` with the same `> Adapted for Kiro Power` header.
 
 ## How Kiro loads them
 

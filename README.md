@@ -41,7 +41,8 @@ forge-sdlc-power/
 │   ├── README.md
 │   ├── common/                       # language-agnostic
 │   ├── typescript/                   # TS/JS extensions
-│   └── python/                       # Python extensions
+│   ├── python/                       # Python extensions
+│   └── php/                          # PHP extensions (PSR-12, PHPUnit/Pest)
 ├── .kiro/agents/                      # sub-agents — tool-bundle-per-stage
 │   ├── orchestrator.json             # team lead
 │   ├── planner.json
@@ -112,11 +113,13 @@ The `rules/` directory contains the governance rules from ECC, adapted with Kiro
 
 ```bash
 # In your Power directory
-mkdir -p steering/rules/{common,typescript,python}
+mkdir -p steering/rules/{common,typescript,python,php}
 cp ../../rules/common/security.md      steering/rules/common/
 cp ../../rules/common/coding-style.md  steering/rules/common/
 cp ../../rules/common/testing.md       steering/rules/common/
 cp ../../rules/typescript/coding-style.md steering/rules/typescript/
+cp ../../rules/python/coding-style.md  steering/rules/python/
+cp ../../rules/php/coding-style.md     steering/rules/php/
 # ... etc
 
 # Prepend `inclusion: always` to each
