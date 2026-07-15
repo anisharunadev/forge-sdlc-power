@@ -163,7 +163,7 @@ The cost is a small amount of indirection (manifest + install script). The benef
 
 ## Origin and pattern reference
 
-This pattern is the **adapter layer** for the [affaan-m/ecc](https://github.com/affaan-m/ecc) architecture when applied to multi-tool Kiro Powers. Related prior art:
+This pattern is the **adapter layer** for multi-tool Kiro Powers. Related prior art:
 - [agentic-sdlc-development](https://github.com/topics/sdlc-automation) — pluggable capability packs via plugin manifests
 - [Atlassian Forge MCP server](https://developer.atlassian.com/platform/forge/ai-development-toolkit/forge-mcp/) — remote MCP for Atlassian tooling
 - [SDLC Workflow Skills](https://lobehub.com/mcp/fancybread-com-sdlc-workflow-skills) — skills format + MCP wiring

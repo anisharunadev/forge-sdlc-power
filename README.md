@@ -1,13 +1,13 @@
-# forge-sdlc — ECC-pattern Kiro Power template
+# forge-sdlc — standard-pattern Kiro Power template
 
-A reusable template for building Kiro Powers using the [affaan-m/ecc](https://github.com/affaan-m/ecc) pattern. Built and battle-tested across the FORGE SDLC pilot (M25) and the security-audit example.
+A reusable template for building Kiro Powers. Built and battle-tested across the FORGE SDLC pilot (M25) and the security-audit example.
 
 The template gives you:
 - An **orchestrator sub-agent** that coordinates, never executes
 - **Focused sub-agents per stage**, each with a narrow `allowedTools` bundle
 - **On-demand steering** for knowledge injection (load only when relevant)
 - **Hooks for cross-cutting policy** (block destructive ops, capture audit trail, persist session state)
-- The **ECC `rules/` layer** integrated as `Always`-mode governance that every sub-agent inherits
+- the **standard `rules/` layer** integrated as `Always`-mode governance that every sub-agent inherits
 
 ## What this is, what this isn't
 
@@ -24,7 +24,7 @@ The template gives you:
 | See the small example | [`examples/security-audit/`](examples/security-audit/) |
 | Build a new Power from this template | Copy a templates file, follow SKILL.md step by step |
 | Add a new external integration (Jira, GitHub, Bitbucket, ClickUp, anything) | [`adapters/`](adapters/) + [`skills/build-adapter/SKILL.md`](skills/build-adapter/SKILL.md) |
-| Adopt ECC's governance rules | [`rules/`](rules/) — copy what you need into `steering/rules/` with `inclusion: always` |
+| Adopt the governance rules | [`rules/`](rules/) — copy what you need into `steering/rules/` with `inclusion: always` |
 | See the full lifecycle flow (start → ticket → status updates → PR) | [`POWER.md`](POWER.md) § "Lifecycle entry points" + [`steering/05-requirements-stage.md`](steering/05-requirements-stage.md) |
 | See how the orchestrator posts humanized status updates | [`adapters/jira/steering/humanized-status.md`](adapters/jira/steering/humanized-status.md) + [`hooks/post-stage-cmd.js`](hooks/post-stage-cmd.js) |
 
@@ -51,7 +51,7 @@ forge-sdlc-power/
 │   ├── 02-tooling-conventions.md     # fileMatch — build files
 │   ├── 03-quality-gates.md           # fileMatch — test files
 │   └── 04-security-baseline.md       # fileMatch — diffs touching any file
-├── rules/                             # ECC always-on governance layer
+├── rules/                             # always-on governance layer
 │   ├── README.md
 │   ├── common/                       # language-agnostic
 │   ├── typescript/                   # TS/JS extensions
@@ -85,7 +85,7 @@ forge-sdlc-power/
     └── hook.template.json
 ```
 
-## The three principles (from ECC, ported to Kiro)
+## The three principles
 
 1. **Tool-bundle-per-stage.** Every sub-agent's `allowedTools` is a positive allowlist. The orchestrator cannot Edit. The implementer cannot deploy. The validator cannot modify code it validates. This is your security boundary.
 
@@ -119,11 +119,11 @@ USER TYPES "forge" or "pillar-1" or "jira-to-pr"
  └────────────────────────────────────────────┘
 ```
 
-The validator uses a **different model than the implementer** (opus vs sonnet) and has no Edit/MultiEdit — this is ECC's "independent validator" principle, and it's the one rule the pattern enforces strictly.
+The validator uses a **different model than the implementer** (opus vs sonnet) and has no Edit/MultiEdit — this is the "independent validator" principle, and it's the one rule the pattern enforces strictly.
 
-## Adopting ECC's rules layer
+## Adopting the rules layer
 
-The `rules/` directory contains the governance rules from ECC, adapted with Kiro-compatible frontmatter pointers. To wire them into a Power:
+The `rules/` directory contains the always-on governance rules, adapted with Kiro-compatible frontmatter pointers. To wire them into a Power:
 
 ```bash
 # In your Power directory
@@ -161,9 +161,9 @@ Before shipping a Power built from this template, run through [`skills/build-kir
 
 ## Origin and pattern reference
 
-This template is a Kiro-Power adaptation of the [affaan-m/ecc](https://github.com/affaan-m/ecc) pattern, MIT-licensed. The primitives map 1:1:
+This template is MIT-licensed. The primitives map 1:1:
 
-| ECC | Kiro Power |
+| Standard | Kiro Power |
 |---|---|
 | `SKILL.md` (on-demand by `description:`) | `steering/*.md` (on-demand / fileMatch) |
 | `agents/*.md` (sub-agents) | `.kiro/agents/*.json` (custom agents) |
@@ -175,5 +175,5 @@ See [`skills/build-kiro-power/SKILL.md`](skills/build-kiro-power/SKILL.md) for t
 
 ## License
 
-The structure, code, and original content in this repo: MIT (same as upstream ECC).
-The `rules/` directory: adapted from [affaan-m/ecc](https://github.com/affaan-m/ecc) under MIT — see individual file headers.
+The structure, code, and original content in this repo: MIT.
+The `rules/` directory: see individual file headers for license.

@@ -8,12 +8,12 @@ keywords:
   - sast
 activation: keyword
 version: 1.0.0
-based-on: forge-sdlc ECC-pattern template
+based-on: forge-sdlc standard-pattern template
 ---
 
-# security-audit — fresh-domain ECC example
+# security-audit — fresh-domain example
 
-This Power proves the ECC pattern generalizes beyond the SDLC pipeline. Same primitives — orchestrator, sub-agents, on-demand steering, hooks — but applied to a single-domain workflow: security auditing.
+This Power proves the architecture generalizes beyond the SDLC pipeline. Same primitives — orchestrator, sub-agents, on-demand steering, hooks — but applied to a single-domain workflow: security auditing.
 
 ## When to activate
 

@@ -31,5 +31,5 @@
   ],
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
-  "notes": "INDEPENDENCE PRINCIPLE: the validator uses a different model (opus vs sonnet for implementer) and has no Edit/MultiEdit — it cannot modify the code it validates. Hook layer also blocks writes to source files. This is ECC's 'independent validator' principle."
+  "notes": "INDEPENDENCE PRINCIPLE: the validator uses a different model (opus vs sonnet for implementer) and has no Edit/MultiEdit — it cannot modify the code it validates. Hook layer also blocks writes to source files. This is the 'independent validator' principle."
 }

@@ -1,12 +1,12 @@
 > Adapted for Kiro Power: this file is loaded as an Always-mode steering rule. References to "Claude Code" can be read as "Kiro".
 > 
-> Origin: ECC (https://github.com/affaan-m/ecc)
+
 > License: MIT
 > Path in source: rules/php/README.md
 
 # PHP rules
 
-This directory contains PHP-specific extensions to the common governance layer, adapted from [affaan-m/ecc](https://github.com/affaan-m/ecc) (MIT).
+This directory contains PHP-specific extensions to the common governance layer. See individual file headers for license.
 
 ## Files
 
@@ -49,4 +49,4 @@ The base hook layer (`hooks/`) already blocks edits to `*.lock` and `.env*`. For
 
 ## Origin and license
 
-Adapted from [affaan-m/ecc](https://github.com/affaan-m/ecc) under MIT. See individual file headers for source paths.
+See individual file headers for license.

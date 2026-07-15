@@ -1,6 +1,8 @@
 # README.md
 
-> Placeholder — source file not present in ECC upstream at fetch time.
-> Origin: ECC (https://github.com/affaan-m/ecc)
+> Placeholder — source file not present in upstream at fetch time.
+> Origin: forge-sdlc rules layer
+> License: MIT
 
-(To be populated from https://github.com/affaan-m/ecc/blob/main/rules/typescript/README.md)
+
+(To be populated from the upstream TypeScript rules reference)

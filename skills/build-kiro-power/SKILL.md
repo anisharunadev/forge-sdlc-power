@@ -1,14 +1,13 @@
 ---
 name: build-kiro-power
-description: Build a Kiro Power using the ECC pattern — thin POWER.md intake, an orchestrator sub-agent that spawns focused sub-agents per stage, on-demand steering for knowledge, and hooks for cross-cutting policy. Use this when starting a new Kiro Power from scratch or refactoring an existing one.
+description: Build a Kiro Power — thin POWER.md intake, an orchestrator sub-agent that spawns focused sub-agents per stage, on-demand steering for knowledge, and hooks for cross-cutting policy. Use this when starting a new Kiro Power from scratch or refactoring an existing one.
 metadata:
-  origin: forge-sdlc ECC-pattern adaptation
-  based-on: affaan-m/ecc
+  origin: forge-sdlc-pattern adaptation
 ---
 
-# Build a Kiro Power — ECC pattern
+# Build a Kiro Power
 
-This is the meta-skill. Use it whenever you are about to build a new Kiro Power. Following this pattern is what makes a Power "ECC-compatible" — meaning it composes with other ECC-pattern Powers, inherits shared governance from `rules/`, and benefits from the same hook enforcement.
+This is the meta-skill. Use it whenever you are about to build a new Kiro Power. Following this pattern is what makes a Power compatible with the rest of the forge-sdlc ecosystem — it composes with other Powers, inherits shared governance from `rules/`, and benefits from the same hook enforcement.
 
 ## When to use
 
@@ -32,7 +31,7 @@ This is the meta-skill. Use it whenever you are about to build a new Kiro Power.
 │   ├── 00-governance.md       # Always mode — every sub-agent sees this
 │   ├── 01-...md               # On-demand (fileMatch or description match)
 │   └── NN-...md
-├── rules/                      # ECC rules layer (governance that all ECC Powers share)
+├── rules/                      # common governance rules layer (governance that all Powers share)
 │   ├── common/                # language-agnostic
 │   ├── typescript/            # TS-specific extensions
 │   └── python/                # Python-specific extensions
@@ -64,7 +63,7 @@ version: 0.1.0
 ```
 
 Rules:
-- `description` is **one sentence, under 30 words**. The harness uses it for routing. Bloated descriptions = fires too often. ECC's own analysis: keep it short and specific.
+- `description` is **one sentence, under 30 words**. The harness uses it for routing. Bloated descriptions = fires too often. our own analysis: keep it short and specific.
 - `keywords` are the activation handles. Pick 3–5 distinct ones, not 20.
 - `name` must match the directory name. Kiro rejects mismatches.
 
@@ -134,11 +133,11 @@ Steering files are the on-demand knowledge layer. Three modes:
 Rules:
 - **Keep `00-governance.md` short.** Every sub-agent pays the context cost. Aim for <100 lines.
 - **One steering file per concept, not per stage.** Stage-specific guidance goes in the stage agent's `contextSteering`, not in a steering file.
-- **Description-based routing depends on the `description` field being clear.** ECC's analysis: ≤30 words, specific triggers, no vague verbs.
+- **Description-based routing depends on the `description` field being clear.** our analysis: ≤30 words, specific triggers, no vague verbs.
 
 ## Step 5 — rules/
 
-Copy the relevant `rules/` files into `steering/rules/` with `inclusion: always`. The rules layer is the shared governance that all ECC-pattern Powers inherit.
+Copy the relevant `rules/` files into `steering/rules/` with `inclusion: always`. The rules layer is the shared governance that all standard-pattern Powers inherit.
 
 Minimum viable rules for a new Power:
 - `rules/common/security.md` (always)
@@ -146,7 +145,7 @@ Minimum viable rules for a new Power:
 - `rules/common/testing.md` (if the Power writes code with tests)
 - `rules/<language>/coding-style.md` + `patterns.md` (language-specific)
 
-Available language layers staged in this repo: `common/`, `typescript/`, `python/`, `php/`. ECC upstream has 20+ more (golang, rust, java, kotlin, swift, ruby, react, vue, angular, nuxt, react-native, web, cpp, csharp, dart, fsharp, perl, arkts). To add one, fetch from `https://raw.githubusercontent.com/affaan-m/ecc/main/rules/<language>/<filename>` and stage under `rules/<language>/` with the same `> Adapted for Kiro Power` header.
+Available language layers staged in this repo: `common/`, `typescript/`, `python/`, `php/`. The upstream reference has 20+ more (golang, rust, java, kotlin, swift, ruby, react, vue, angular, nuxt, react-native, web, cpp, csharp, dart, fsharp, perl, arkts). To add one, fetch from the upstream registry and stage under `rules/<language>/` with the `> Adapted for Kiro Power` header.
 
 Wire them up by symlinking or copying:
 
@@ -215,9 +214,9 @@ A new Power is ready when:
 
 ## Pattern provenance
 
-This skill is the meta-skill of the `forge-sdlc` Power, which is itself a Kiro-Power adaptation of the [affaan-m/ecc](https://github.com/affaan-m/ecc) pattern. The primitives map 1:1:
+This skill is the meta-skill of the `forge-sdlc` Power. The primitives map 1:1:
 
-| ECC | Kiro Power |
+| Standard | Kiro Power |
 |---|---|
 | `SKILL.md` (on-demand by `description:`) | `steering/*.md` (on-demand / fileMatch) |
 | `agents/*.md` (sub-agents) | `.kiro/agents/*.json` (custom agents) |

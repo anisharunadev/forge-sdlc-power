@@ -1,6 +1,6 @@
 > Adapted for Kiro Power: this file is loaded as an Always-mode steering rule. References to "Claude Code" can be read as "Kiro".
 > 
-> Origin: ECC (https://github.com/affaan-m/ecc)
+
 > License: MIT
 > Path in source: rules/php/testing.md
 > Extends: ../common/testing.md

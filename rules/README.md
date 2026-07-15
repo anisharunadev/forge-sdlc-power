@@ -1,7 +1,6 @@
-# rules/ — ECC always-on governance layer
+# rules/ — always-on governance layer
 
-This directory contains the always-on governance rules inherited from ECC
-(Everything Claude Code) by affaan-m.
+This directory contains the always-on governance rules shipped with the template.
 
 ## Layering
 
@@ -23,7 +22,7 @@ Currently staged:
 | python | 4 | staged |
 | php | 4 | staged |
 
-ECC upstream has 20+ more language directories (golang, rust, java, kotlin, swift, ruby, react, vue, angular, nuxt, react-native, web, cpp, csharp, dart, fsharp, perl, arkts). To add one, fetch from `https://raw.githubusercontent.com/affaan-m/ecc/main/rules/<language>/<filename>` and stage under `rules/<language>/` with the same `> Adapted for Kiro Power` header.
+Upstream has 20+ more language directories (golang, rust, java, kotlin, swift, ruby, react, vue, angular, nuxt, react-native, web, cpp, csharp, dart, fsharp, perl, arkts). To add one, fetch from the upstream rules registry and stage under `rules/<language>/` with the `> Adapted for Kiro Power` header.
 
 ## How Kiro loads them
 
@@ -41,4 +40,4 @@ This makes governance constant across every stage of the orchestrator's workflow
 
 ## Origin and license
 
-Adapted from [affaan-m/ecc](https://github.com/affaan-m/ecc) (MIT).
+See individual file headers for license.

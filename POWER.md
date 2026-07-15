@@ -13,12 +13,12 @@ keywords:
   - take this to PR
 activation: keyword + natural-language
 version: 2.1.0
-origin: ECC-pattern adaptation
+origin: standard-pattern adaptation
 ---
 
-# forge-sdlc — ECC-pattern SDLC Power
+# forge-sdlc — standard-pattern SDLC Power
 
-This Power implements a five-stage SDLC workflow using the ECC pattern: thin command intake, an orchestrator that spawns focused sub-agents per stage, on-demand steering for knowledge injection, and hooks for cross-cutting policy enforcement.
+This Power implements a five-stage SDLC workflow: thin command intake, an orchestrator that spawns focused sub-agents per stage, on-demand steering for knowledge injection, and hooks for cross-cutting policy enforcement.
 
 ## When to activate
 
@@ -111,7 +111,7 @@ In both cases the rest of the lifecycle is identical: design → implement → v
 
 ## Origin and pattern reference
 
-This Power is built on the [affaan-m/ecc](https://github.com/affaan-m/ecc) pattern:
+The architecture draws on these primitives:
 - Skills (here: steering) load on-demand by description match
 - Sub-agents (here: `.kiro/agents/*.json`) get narrow tool bundles
 - Hooks enforce policy, not knowledge

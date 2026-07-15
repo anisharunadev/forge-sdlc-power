@@ -361,7 +361,7 @@ function writeTicketSystemConfig() {
   const reg = loadRegistry();
   // Priority order: jira > clickup > none
   // First match wins. If both are enabled, jira takes precedence (it's the
-  // more common default in the ECC ecosystem). The user can override by
+  // more common default in the standard ecosystem). The user can override by
   // disabling the higher-priority one.
   let system = null;
   if (reg.adapters.jira && reg.adapters.jira.enabled) system = 'jira';

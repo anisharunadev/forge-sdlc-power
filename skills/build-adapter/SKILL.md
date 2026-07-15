@@ -194,7 +194,7 @@ node adapters/install.js --status
 
 ## Origin and pattern reference
 
-The adapter system is the integration layer for the [affaan-m/ecc](https://github.com/affaan-m/ecc) architecture, applied to forge-sdlc Powers. Related prior art:
+The adapter system is the integration layer for forge-sdlc Powers. Related prior art:
 - [MCP.so](https://mcp.so) — community registry of MCP servers
 - [Atlassian Forge MCP server](https://developer.atlassian.com/platform/forge/ai-development-toolkit/forge-mcp/) — the reference for remote-MCP integration
 - [agentic-sdlc-development](https://github.com/topics/sdlc-automation) — pluggable capability packs via plugin manifests

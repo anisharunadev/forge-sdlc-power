@@ -1,6 +1,6 @@
 # security-audit — example Power
 
-Fresh-domain example of the ECC pattern. Same primitives as `forge-sdlc`, applied to security auditing instead of a multi-stage SDLC pipeline.
+Fresh-domain example. Same primitives as `forge-sdlc`, applied to security auditing instead of a multi-stage SDLC pipeline.
 
 ## Why this exists
 

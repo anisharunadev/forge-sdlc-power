@@ -8,9 +8,9 @@ activation: keyword
 version: 0.1.0
 ---
 
-# <Power Title> — ECC-pattern Power
+# <Power Title> — standard-pattern Power
 
-This Power follows the [ECC pattern](../../skills/build-kiro-power/SKILL.md). It uses:
+This Power follows the patterns in [skills/build-kiro-power/SKILL.md](../../skills/build-kiro-power/SKILL.md). It uses:
 - An orchestrator sub-agent that coordinates, never executes
 - Focused sub-agents per stage, each with a narrow `allowedTools` bundle
 - On-demand steering for knowledge injection
@@ -64,4 +64,4 @@ USER TYPES KEYWORD
 
 ## Origin and pattern reference
 
-Built on the [affaan-m/ecc](https://github.com/affaan-m/ecc) pattern via [skills/build-kiro-power/SKILL.md](../../skills/build-kiro-power/SKILL.md).
+See [skills/build-kiro-power/SKILL.md](../../skills/build-kiro-power/SKILL.md) for the full pattern specification.

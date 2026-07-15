@@ -1,5 +1,5 @@
-> Origin: ECC (https://github.com/affaan-m/ecc)
-> License: Same as upstream (MIT per ECC repo)
+
+> License: MIT
 > Adapted for Kiro Power: this file is loaded as an Always-mode steering rule. References to "Claude Code" can be read as "Kiro".
 
 # Git Workflow
@@ -12,7 +12,7 @@
 
 Types: feat, fix, refactor, docs, test, chore, perf, ci
 
-Note: To disable co-author attribution on commits, set `"includeCoAuthoredBy": false` in `~/.claude/settings.json` (Claude Code appends `Co-Authored-By` by default; ECC does not ship this setting).
+Note: To disable co-author attribution on commits, set `"includeCoAuthoredBy": false` in `~/.claude/settings.json` (Claude Code appends `Co-Authored-By` by default).
 
 ## Pull Request Workflow
 
