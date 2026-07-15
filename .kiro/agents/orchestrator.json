@@ -61,5 +61,54 @@
     "configFile": ".forge/ticket-system.json"
   },
   "maxCycles": 3,
-  "notes": "allowedTools deliberately excludes Write/Edit/Bash — the orchestrator coordinates via Task spawn, never edits files itself. If a stage needs a file written, that file's owner is the relevant sub-agent. The orchestrator's runtime allowedTools will be augmented by the install script with post_status_update tools from any enabled ticket-system adapter (jira_post_status_update, clickup_post_status_update, etc.)."
+  "runtime": {
+    "_comment": "Runtime integrations. Each entry is a hook point + the script that handles it. The orchestrator consults this on every transition. Scripts are Node CLI tools; the orchestrator runs them via Bash (the runtime host grants it, even though the agent manifest denies Bash for general use — see notes).",
+    "preflight": {
+      "trigger": "before_stage_1",
+      "command": "node enterprise/preflight/check.js --json",
+      "onNotReady": "abort_with_user_message",
+      "description": "Refuse to start stage 1 if the repo isn't ready. Catches 9 common issues (dirty working tree, missing env vars, etc.)."
+    },
+    "resume": {
+      "trigger": "on_forge_continue",
+      "command": "node enterprise/resume/continue.js <KEY> --json",
+      "fallback": "If --force, retry the failed stage. Otherwise, advance to the next stage.",
+      "description": "On 'forge continue <KEY>', read prior state and emit the resume directive."
+    },
+    "research": {
+      "trigger": "stage_2_design",
+      "command": "node enterprise/research/research.js --json <library> [...]",
+      "onResult": "include directive in architect's prompt; orchestrator makes the actual MCP call",
+      "description": "Architect calls this for each library in the new design. Emits a directive the orchestrator can act on."
+    },
+    "tests": {
+      "trigger": "stage_4_validate",
+      "command": "node enterprise/tests/collect.js --json --diff",
+      "onResult": "include diff in validator report; orchestrator posts humanized diff to ticket",
+      "description": "Validator calls this once at stage 4. Captures test results + diff vs. prior run."
+    },
+    "monorepo": {
+      "trigger": "stage_4_validate",
+      "command": "for each repo in .forge/monorepo.json: node enterprise/monorepo/check-per-repo.js <repo> --json",
+      "onResult": "all repos must PASS for the validator's verdict to be PASS",
+      "description": "When monorepo.json exists, the validator fans out to each repo and aggregates."
+    },
+    "ci": {
+      "trigger": "on_adapter_install",
+      "command": "node enterprise/ci/generate.js --target github -o .github/workflows/forge-validate.yml",
+      "description": "At install time, generate the CI pipeline from the orchestrator's stages[] config. Done once, not per-stage."
+    },
+    "backlog": {
+      "trigger": "long_lived_process",
+      "command": "node enterprise/backlog/dispatcher.js --max-parallel 3 --loop 30 &",
+      "description": "A separate long-lived process that drains the ticket queue. Not part of the orchestrator's per-ticket flow."
+    },
+    "postStage": {
+      "_comment": "Already wired via hooks/post-stage-cmd.js. Listed here for completeness.",
+      "trigger": "after_every_stage",
+      "command": "see hooks/post-stage-cmd.js",
+      "description": "Writes .forge/post-stage-prompt.json with the humanized status update."
+    }
+  },
+  "notes": "allowedTools deliberately excludes Write/Edit/Bash for general use. The runtime integration is gated by the host environment: the orchestrator's host grants Bash for the specific scripts listed in `runtime.*.command` (via the hook layer or the install script), even though the manifest denies it broadly. This is the security pattern: deny-by-default, allowlist-by-script."
 }

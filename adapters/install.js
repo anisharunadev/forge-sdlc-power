@@ -20,6 +20,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
 
 const ROOT = process.cwd();
 const ADAPTERS_DIR = path.join(ROOT, 'adapters');
@@ -345,6 +346,34 @@ function apply() {
   applyStageAdditions();
   writeTicketSystemConfig();
   writeNextCommandsConfig();
+  generateCI();
+}
+
+// ---------- CI generation ----------
+//
+// After every install/apply, regenerate the CI pipeline from the
+// orchestrator's stages[] config. Default target: GitHub Actions.
+// Override with --ci-target (github|gitlab|jenkins) and --ci-output PATH.
+
+function generateCI() {
+  const ciTarget = process.env.FORGE_CI_TARGET || 'github';
+  const ciOutput = process.env.FORGE_CI_OUTPUT || (
+    ciTarget === 'github' ? '.github/workflows/forge-validate.yml' :
+    ciTarget === 'gitlab' ? '.gitlab-ci.yml' :
+    'Jenkinsfile'
+  );
+  const GENERATOR = path.join(ROOT, 'enterprise/ci/generate.js');
+  if (!fs.existsSync(GENERATOR)) return; // ci feature not installed
+  const r = spawnSync(process.execPath, [GENERATOR, '--target', ciTarget, '-o', ciOutput], {
+    encoding: 'utf8',
+    cwd: ROOT,
+    timeout: 15000,
+  });
+  if (r.status === 0) {
+    console.log(`[install] CI generated: ${ciOutput}`);
+  } else {
+    console.error(`[install] CI generation failed: ${r.stderr || r.stdout}`);
+  }
 }
 
 // ---------- ticket-system + next-commands config writers ----------

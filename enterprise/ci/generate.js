@@ -112,14 +112,14 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node.js
-        if: ${{ hashFiles('package.json') != '' }}
+        if: \${{ hashFiles('package.json') != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: '${stack.packageManager}'
 
       - name: Setup Python
-        if: ${{ hashFiles('pyproject.toml') != '' }}
+        if: \${{ hashFiles('pyproject.toml') != '' }}
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -136,7 +136,7 @@ jobs:
             : `${stack.packageManager} install`}
 
       - name: Type check
-        if: ${{ hashFiles('tsconfig.json') != '' || hashFiles('pyproject.toml') != '' }}
+        if: \${{ hashFiles('tsconfig.json') != '' || hashFiles('pyproject.toml') != '' }}
         run: ${stack.typecheck || 'echo "no type check configured"'}
 
       - name: Lint
@@ -146,7 +146,7 @@ jobs:
         run: ${stack.test || 'echo "no test configured"'}
 
       - name: Format check
-        if: ${{ hashFiles('.prettierrc*') != '' || hashFiles('pyproject.toml') != '' }}
+        if: \${{ hashFiles('.prettierrc*') != '' || hashFiles('pyproject.toml') != '' }}
         run: ${stack.format || 'echo "no format check configured"'}
 
       - name: Secret scan
@@ -271,7 +271,7 @@ switch (target) {
 }
 
 if (outFile) {
-  const dest = path.join(ROOT, outFile);
+  const dest = path.isAbsolute(outFile) ? outFile : path.join(ROOT, outFile);
   if (exists(dest) && !force) {
     console.error(`Refusing to overwrite existing file: ${dest}. Pass --force to overwrite.`);
     process.exit(1);

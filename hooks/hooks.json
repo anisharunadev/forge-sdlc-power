@@ -11,6 +11,16 @@
             "description": "Block destructive operations: --no-verify, force-push to protected branches, writes to lockfiles/linter configs/.env*"
           }
         ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/pre-stage-gate.js",
+            "description": "Refuse the very first Task spawn if preflight reports NOT_READY. Gated by FORGE_FIRST_INVOCATION=1 (set by the host on the first Task, unset after)."
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -31,6 +41,11 @@
             "type": "command",
             "command": "node hooks/post-stage-cmd.js",
             "description": "After a sub-agent Task completes, write a humanized status-update prompt to .forge/post-stage-prompt.json. The orchestrator picks it up and calls jira_post_status_update (or clickup equivalent) on the next turn."
+          },
+          {
+            "type": "command",
+            "command": "node hooks/post-validator-collect.js",
+            "description": "After the validator sub-agent finishes, run the project's tests and write the diff to .forge/test-diff.json. The orchestrator includes this in the humanized status update."
           }
         ]
       }
