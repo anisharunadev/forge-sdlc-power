@@ -2,21 +2,17 @@
   "name": "orchestrator",
   "description": "Team lead for the forge-sdlc pipeline. Reads workflow state, decides which sub-agent to spawn next, parses verdict lines, routes between stages, and posts humanized status updates to the configured ticket system. Coordinates; never executes stage work itself.",
   "model": "opus",
+  "prompt": "file://../../steering/00-governance.md",
   "allowedTools": [
     "Glob",
     "Grep",
     "Read",
     "Task",
     "TodoWrite",
-    "jira_post_status_update"
+    "jira_post_status_update",
+    "mcp__power-forge-sdlc-jira__jira_post_status_update"
   ],
-  "deniedTools": [
-    "Write",
-    "Edit",
-    "Bash",
-    "MultiEdit"
-  ],
-  "systemPromptPath": "steering/00-governance.md",
+  "includeMcpJson": true,
   "stages": [
     {
       "id": 1,
@@ -62,7 +58,7 @@
   },
   "maxCycles": 3,
   "runtime": {
-    "_comment": "Runtime integrations. Each entry is a hook point + the script that handles it. The orchestrator consults this on every transition. Scripts are Node CLI tools; the orchestrator runs them via Bash (the runtime host grants it, even though the agent manifest denies Bash for general use — see notes).",
+    "_comment": "Runtime integrations. Each entry is a hook point + the script that handles it. The orchestrator consults this on every transition. Scripts are Node CLI tools; the orchestrator runs them via Bash (the runtime host grants it, even though the agent manifest omits Bash from allowedTools — see notes).",
     "preflight": {
       "trigger": "before_stage_1",
       "command": "node enterprise/preflight/check.js --json",
@@ -110,5 +106,20 @@
       "description": "Writes .forge/post-stage-prompt.json with the humanized status update."
     }
   },
-  "notes": "allowedTools deliberately excludes Write/Edit/Bash for general use. The allowlist-by-script pattern is ENFORCED by hooks/pre-tool-allowlist-runtime.js (wired in .kiro/hooks/pre-tool-allowlist-runtime.json as the first PreToolUse Bash hook): it allows only bash commands starting with one of the scripts listed in `runtime.*.command` and blocks (exit 2) everything else. The destructive-pattern blocker runs after it. This is the security pattern: deny-by-default, allowlist-by-script — enforced at the hook layer, not merely by host convention. Keep the ALLOWED_SCRIPTS list in that hook in sync with the runtime.* commands here."
+  "knowledgeBases": [
+    {
+      "_comment": "ponytail: orchestrator-only KB slice for cross-session decision memory. Indexes existing steering/ + .forge/ — no new writers, no schema. Upgrade when: agents need per-stage KBs (planner/implementer) or .forge/ gets too large to index whole.",
+      "name": "forge-steering",
+      "path": "../../steering/",
+      "indexType": "Best",
+      "description": "On-demand governance knowledge per stage."
+    },
+    {
+      "name": "forge-decisions",
+      "path": "../../.forge/",
+      "indexType": "Best",
+      "description": "Prior tickets, validation verdicts, audit trail — decision memory across cycles."
+    }
+  ],
+  "notes": "allowedTools deliberately excludes Write/Edit/Bash/MultiEdit — security by omission. The allowlist-by-script pattern is ENFORCED by hooks/pre-tool-allowlist-runtime.js (wired in .kiro/hooks/pre-tool-allowlist-runtime.json as the first PreToolUse Bash hook): it allows only bash commands starting with one of the scripts listed in `runtime.*.command` and blocks (exit 2) everything else. The destructive-pattern blocker runs after it. This is the security pattern: deny-by-default, allowlist-by-script — enforced at the hook layer, not merely by host convention. Keep the ALLOWED_SCRIPTS list in that hook in sync with the runtime.* commands here."
 }

@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash|Edit|Write|MultiEdit", "hooks": [{ "type": "command", "command": "node hooks/pre-tool-block-destructive.js", "timeout": 5 }] },
+      { "matcher": "Bash", "hooks": [{ "type": "command", "command": "node hooks/pre-tool-allowlist-runtime.js", "timeout": 5 }] },
+      { "matcher": "Task", "hooks": [{ "type": "command", "command": "node hooks/pre-stage-gate.js", "timeout": 5 }] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Bash|Edit|Write|MultiEdit", "hooks": [{ "type": "command", "command": "node hooks/post-tool-capture-diff.js", "timeout": 10 }] },
+      { "matcher": "Task", "hooks": [{ "type": "command", "command": "node hooks/post-validator-collect.js", "timeout": 10 }] },
+      { "matcher": "Task", "hooks": [{ "type": "command", "command": "node hooks/post-stage-cmd.js", "timeout": 10 }] }
+    ],
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "node hooks/session-start-load-context.js", "timeout": 10 }] },
+      { "hooks": [{ "type": "command", "command": "node hooks/session-start-pick-ticket-system.js", "timeout": 10 }] }
+    ],
+    "PreCompact": [
+      { "hooks": [{ "type": "command", "command": "node hooks/pre-compact-flush-state.js", "timeout": 30 }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "node hooks/session-end-snapshot.js", "timeout": 30 }] }
+    ]
+  }
+}

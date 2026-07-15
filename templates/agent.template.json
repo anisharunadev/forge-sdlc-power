@@ -1,28 +1,31 @@
 {
+  "_comment": "forge-sdlc-power custom-agent template. Conforms to the kiro.dev Agent configuration reference (https://kiro.dev/llms.txt). Field-by-field mapping in .kiro/agents/README.md.",
   "name": "<stage-name>",
   "description": "<one sentence — what this stage does>",
   "model": "sonnet",
+  "prompt": "file://../../steering/00-governance.md",
+  "resources": [
+    "file://../../steering/01-stage-patterns.md"
+  ],
   "allowedTools": [
     "Read",
     "Glob",
     "Grep",
     "Write"
   ],
-  "deniedTools": [
-    "Task"
-  ],
-  "writablePaths": [
-    ".forge/stage<N>-<artifact>.md"
-  ],
-  "deniedPaths": [
-    "**/*.lock",
-    "**/*.lockb",
-    ".env*"
-  ],
-  "systemPromptPath": "steering/00-governance.md",
-  "contextSteering": [
-    "steering/01-stage-patterns.md"
-  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        ".forge/stage<N>-<artifact>.md"
+      ],
+      "deniedPaths": [
+        "**/*.lock",
+        "**/*.lockb",
+        ".env*"
+      ]
+    }
+  },
+  "includeMcpJson": true,
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO"
 }

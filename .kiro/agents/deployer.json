@@ -2,6 +2,12 @@
   "name": "deployer",
   "description": "Stage 5 of the forge-sdlc pipeline. Reads the validator's report. If PASS, opens a PR and surfaces the URL for human review. May NOT merge to main without explicit user approval.",
   "model": "sonnet",
+  "prompt": "file://../../steering/00-governance.md",
+  "resources": [
+    "file://../../steering/04-security-baseline.md",
+    "file://../../adapters/jira/steering/deployer-notes.md",
+    "file://../../adapters/github/steering/deployer-notes.md"
+  ],
   "allowedTools": [
     "Bash",
     "Glob",
@@ -13,29 +19,31 @@
     "github_request_review",
     "jira_add_comment",
     "jira_post_status_update",
-    "jira_transition"
+    "jira_transition",
+    "mcp__power-forge-sdlc-github__github_get_pr",
+    "mcp__power-forge-sdlc-github__github_open_pr",
+    "mcp__power-forge-sdlc-github__github_request_review",
+    "mcp__power-forge-sdlc-jira__jira_add_comment",
+    "mcp__power-forge-sdlc-jira__jira_post_status_update",
+    "mcp__power-forge-sdlc-jira__jira_transition"
   ],
-  "deniedTools": [
-    "Edit",
-    "MultiEdit",
-    "Task"
-  ],
-  "writablePaths": [
-    ".forge/stage5-pr.md"
-  ],
-  "blockedCommands": [
-    "git push --force",
-    "gh pr merge",
-    "git push origin main",
-    "git push origin master"
-  ],
-  "systemPromptPath": "steering/00-governance.md",
-  "contextSteering": [
-    "steering/04-security-baseline.md",
-    "../adapters/jira/steering/deployer-notes.md",
-    "../adapters/github/steering/deployer-notes.md"
-  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        ".forge/stage5-pr.md"
+      ]
+    },
+    "shell": {
+      "deniedCommands": [
+        "git push --force",
+        "gh pr merge",
+        "git push origin main",
+        "git push origin master"
+      ]
+    }
+  },
+  "includeMcpJson": true,
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
-  "notes": "May push branch and open PR. May NOT force-push to protected branches or merge. The human reviews and merges."
+  "notes": "May push branch and open PR. May NOT force-push to protected branches or merge (deniedCommands + hook enforces). The human reviews and merges."
 }

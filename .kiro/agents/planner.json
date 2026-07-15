@@ -2,6 +2,10 @@
   "name": "planner",
   "description": "Stage 1 of the forge-sdlc pipeline. Reads the ticket, searches the codebase, and produces a structured implementation plan with testable success criteria. Read-only — no code edits.",
   "model": "sonnet",
+  "prompt": "file://../../steering/00-governance.md",
+  "resources": [
+    "file://../../steering/01-stage-patterns.md"
+  ],
   "allowedTools": [
     "Glob",
     "Grep",
@@ -11,22 +15,22 @@
     "github_list_branches",
     "jira_create_ticket",
     "jira_get_ticket",
-    "jira_search"
+    "jira_search",
+    "mcp__power-forge-sdlc-github__github_get_repo",
+    "mcp__power-forge-sdlc-github__github_list_branches",
+    "mcp__power-forge-sdlc-jira__jira_create_ticket",
+    "mcp__power-forge-sdlc-jira__jira_get_ticket",
+    "mcp__power-forge-sdlc-jira__jira_search"
   ],
-  "deniedTools": [
-    "Edit",
-    "Bash",
-    "Task",
-    "MultiEdit"
-  ],
-  "writablePaths": [
-    ".forge/stage1-plan.md"
-  ],
-  "systemPromptPath": "steering/00-governance.md",
-  "contextSteering": [
-    "steering/01-stage-patterns.md"
-  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        ".forge/stage1-plan.md"
+      ]
+    }
+  },
+  "includeMcpJson": true,
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
-  "notes": "Read + write to .forge/stage1-plan.md ONLY. No code edits. No sub-agent spawn. No bash."
+  "notes": "Read + write to .forge/stage1-plan.md ONLY. No code edits. No sub-agent spawn (Task not in allowedTools). No bash (Bash not in allowedTools)."
 }

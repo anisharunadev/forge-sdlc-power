@@ -2,6 +2,10 @@
   "name": "architect",
   "description": "Stage 2 of the forge-sdlc pipeline. Reads the planner's plan, makes design decisions, and writes an Architecture Decision Record (ADR). No code edits — only design docs.",
   "model": "opus",
+  "prompt": "file://../../steering/00-governance.md",
+  "resources": [
+    "file://../../steering/01-stage-patterns.md"
+  ],
   "allowedTools": [
     "Glob",
     "Grep",
@@ -11,23 +15,23 @@
     "context7_resolve_library_id",
     "github_get_repo",
     "jira_get_ticket",
-    "jira_search"
+    "jira_search",
+    "mcp__power-forge-sdlc-context7__context7_query_docs",
+    "mcp__power-forge-sdlc-context7__context7_resolve_library_id",
+    "mcp__power-forge-sdlc-github__github_get_repo",
+    "mcp__power-forge-sdlc-jira__jira_get_ticket",
+    "mcp__power-forge-sdlc-jira__jira_search"
   ],
-  "deniedTools": [
-    "Edit",
-    "Bash",
-    "Task",
-    "MultiEdit"
-  ],
-  "writablePaths": [
-    "docs/adr/",
-    ".forge/stage2-adr.md"
-  ],
-  "systemPromptPath": "steering/00-governance.md",
-  "contextSteering": [
-    "steering/01-stage-patterns.md"
-  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "docs/adr/",
+        ".forge/stage2-adr.md"
+      ]
+    }
+  },
+  "includeMcpJson": true,
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
-  "notes": "Writes ADRs (docs/adr/0001-*.md) and the stage handoff (.forge/stage2-adr.md). No source code edits."
+  "notes": "Writes ADRs (docs/adr/0001-*.md) and the stage handoff (.forge/stage2-adr.md). No source code edits (Edit/MultiEdit/Bash/Task not in allowedTools)."
 }

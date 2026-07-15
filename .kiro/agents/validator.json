@@ -2,6 +2,11 @@
   "name": "validator",
   "description": "Stage 4 of the forge-sdlc pipeline. INDEPENDENT verification of the implementer's diff. Runs deterministic checks (typecheck, lint, tests, secret scan) and writes a verifier report. No code edits. Different model than implementer by design.",
   "model": "opus",
+  "prompt": "file://../../steering/00-governance.md",
+  "resources": [
+    "file://../../steering/03-quality-gates.md",
+    "file://../../steering/04-security-baseline.md"
+  ],
   "allowedTools": [
     "Bash",
     "Glob",
@@ -14,22 +19,24 @@
     "jira_add_comment",
     "jira_add_label",
     "jira_get_ticket",
-    "jira_post_status_update"
+    "jira_post_status_update",
+    "mcp__power-forge-sdlc-context7__context7_query_docs",
+    "mcp__power-forge-sdlc-context7__context7_resolve_library_id",
+    "mcp__power-forge-sdlc-github__github_get_pr",
+    "mcp__power-forge-sdlc-jira__jira_add_comment",
+    "mcp__power-forge-sdlc-jira__jira_add_label",
+    "mcp__power-forge-sdlc-jira__jira_get_ticket",
+    "mcp__power-forge-sdlc-jira__jira_post_status_update"
   ],
-  "deniedTools": [
-    "Edit",
-    "MultiEdit",
-    "Task"
-  ],
-  "writablePaths": [
-    ".forge/validator-report.md"
-  ],
-  "systemPromptPath": "steering/00-governance.md",
-  "contextSteering": [
-    "steering/03-quality-gates.md",
-    "steering/04-security-baseline.md"
-  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        ".forge/validator-report.md"
+      ]
+    }
+  },
+  "includeMcpJson": true,
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
-  "notes": "INDEPENDENCE PRINCIPLE: the validator uses a different model (opus vs sonnet for implementer) and has no Edit/MultiEdit — it cannot modify the code it validates. Hook layer also blocks writes to source files. This is the 'independent validator' principle."
+  "notes": "INDEPENDENCE PRINCIPLE: the validator uses a different model (opus vs sonnet for implementer) and has no Edit/MultiEdit (not in allowedTools) — it cannot modify the code it validates. Hook layer also blocks writes to source files. This is the 'independent validator' principle."
 }

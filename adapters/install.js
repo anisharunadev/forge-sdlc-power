@@ -19,6 +19,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
 
@@ -43,6 +44,7 @@ const cmdEnable = arg('--enable');
 const cmdDisable = arg('--disable');
 const cmdStatus = args.includes('--status');
 const cmdVerify = args.includes('--verify');
+const cmdUserOnly = args.includes('--user-only');
 
 // ---------- load registry ----------
 
@@ -148,6 +150,63 @@ function mergeMcp() {
 
   fs.writeFileSync(ROOT_MCP, JSON.stringify(merged, null, 2) + '\n');
   console.log(`[install] wrote ${ROOT_MCP} with ${Object.keys(merged.mcpServers).length} MCP servers`);
+  return merged;
+}
+
+// ponytail: --user-only skips ROOT_MCP write. Kept separate from mergeMcp so the
+// happy path stays a single straight-line write. Reads the file if it exists
+// (last install's result) so the user-level writer still has a non-empty view
+// when CI has no prior install on the same machine.
+function mergeMcpNoWrite() {
+  if (fs.existsSync(ROOT_MCP)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(ROOT_MCP, 'utf8'));
+      console.log(`[install] --user-only: skipped ROOT_MCP write; reusing ${Object.keys(existing.mcpServers || {}).length} server(s) from existing file`);
+      return existing;
+    } catch (e) {
+      console.warn(`[install] --user-only: could not read existing ROOT_MCP (${e.message}); user-level MCP will be empty`);
+    }
+  } else {
+    console.log('[install] --user-only: no existing ROOT_MCP; user-level MCP will be empty');
+  }
+  return { mcpServers: {} };
+}
+
+// ---------- ~/.kiro/settings/mcp.json (power namespaced) ----------
+//
+// Kiro's user-level MCP config lives at ~/.kiro/settings/mcp.json. It groups
+// servers under a top-level "powers" key, with each power keyed by its name.
+// We deep-merge under "powers.<thisPowerName>" so the user's other powers
+// and other top-level keys are preserved.
+
+const POWER_NAME = 'forge-sdlc';
+const USER_KIRO_DIR = path.join(os.homedir(), '.kiro', 'settings');
+const USER_MCP = path.join(USER_KIRO_DIR, 'mcp.json');
+const USER_SERVER_KEY_PREFIX = `power-${POWER_NAME}-`;
+
+function writeUserMcp(merged) {
+  if (!merged || !merged.mcpServers) return;
+  fs.mkdirSync(USER_KIRO_DIR, { recursive: true });
+  let existing = {};
+  if (fs.existsSync(USER_MCP)) {
+    try { existing = JSON.parse(fs.readFileSync(USER_MCP, 'utf8')) || {}; }
+    catch { existing = {}; }
+  }
+  // ponytail: single server write here — no two writes share a path.
+  const thisPowerServers = {};
+  for (const [k, v] of Object.entries(merged.mcpServers)) {
+    thisPowerServers[`${USER_SERVER_KEY_PREFIX}${k}`] = v;
+  }
+  // ponytail: shallow merge under powers[POWER_NAME]; top-level other powers + keys preserved.
+  const next = {
+    ...existing,
+    powers: {
+      ...(existing.powers || {}),
+      [POWER_NAME]: thisPowerServers,
+    },
+  };
+  fs.writeFileSync(USER_MCP, JSON.stringify(next, null, 2) + '\n');
+  console.log(`[install] wrote ${USER_MCP} under powers.${POWER_NAME} (${Object.keys(thisPowerServers).length} servers)`);
 }
 
 // ---------- agent allowedTools update ----------
@@ -155,13 +214,20 @@ function mergeMcp() {
 function updateAgentAllowedTools() {
   const reg = loadRegistry();
   const updates = new Map(); // agentName -> Set of new tools
+  // ponytail: parallel tool->server map so we can emit the namespaced form later.
+  const toolToServer = new Map(); // tool.name -> bare server key
 
   for (const [name, entry] of Object.entries(reg.adapters)) {
     if (!entry.enabled) continue;
     const loaded = loadAdapter(name);
     if (!loaded) continue;
     const { manifest } = loaded;
+    // ponytail: manifest.mcpServers is an array of bare server keys; tools are
+    // named <server>_<verb>, so prefix-matching gives the source server.
+    const serverKeys = manifest.mcpServers || [];
     for (const tool of manifest.tools || []) {
+      const sourceServer = serverKeys.find((s) => tool.name === s || tool.name.startsWith(`${s}_`));
+      if (sourceServer) toolToServer.set(tool.name, sourceServer);
       for (const stage of tool.stages || []) {
         if (stage === '*') {
           // Wildcard: add to every agent that exists
@@ -187,16 +253,29 @@ function updateAgentAllowedTools() {
     const agent = JSON.parse(fs.readFileSync(agentFile, 'utf8'));
     const allowed = new Set(agent.allowedTools || []);
     let changed = false;
+    let namespacedAdded = 0;
     for (const tool of newTools) {
+      // ponytail: emit both the bare form (legacy agents) AND the namespaced form
+      // mcp__<power-server>__<tool>. Kiro resolves MCP tools via the namespaced
+      // form when the server is registered under power-* keys.
+      const serverKey = toolToServer.get(tool);
+      const namespaced = serverKey
+        ? `mcp__${USER_SERVER_KEY_PREFIX}${serverKey}__${tool}`
+        : null;
       if (!allowed.has(tool)) {
         allowed.add(tool);
         changed = true;
+      }
+      if (namespaced && !allowed.has(namespaced)) {
+        allowed.add(namespaced);
+        changed = true;
+        namespacedAdded++;
       }
     }
     if (changed) {
       agent.allowedTools = [...allowed].sort();
       fs.writeFileSync(agentFile, JSON.stringify(agent, null, 2) + '\n');
-      console.log(`[install] updated ${agentName}: added ${newTools.size} tool(s)`);
+      console.log(`[install] updated ${agentName}: added ${newTools.size} tool(s) (+${namespacedAdded} namespaced)`);
     }
   }
 }
@@ -395,7 +474,11 @@ function cmdVerifyAll() {
 }
 
 function apply() {
-  mergeMcp();
+  // ponytail: --user-only skips writing the repo-root mcp.json (e.g. read-only
+  // CI filesystem). Repo still runs all other apply steps; only the ROOT_MCP
+  // write is suppressed. The user-level file is always written.
+  const merged = cmdUserOnly ? mergeMcpNoWrite() : mergeMcp();
+  writeUserMcp(merged);
   updateAgentAllowedTools();
   updateOrchestratorTicketTool();
   linkAdapterSteering();
@@ -403,6 +486,7 @@ function apply() {
   writeTicketSystemConfig();
   writeNextCommandsConfig();
   generateCI();
+  printSummaryTable();
 }
 
 // ---------- CI generation ----------
@@ -478,6 +562,41 @@ function writeNextCommandsConfig() {
     path.join(dir, 'next-commands.json'),
     JSON.stringify(commands, null, 2) + '\n'
   );
+}
+
+// ---------- install summary table ----------
+//
+// After all writes complete, print a server -> tools audit so the user can
+// verify namespacing at install time. Reads registry fresh — same source as
+// every other step.
+
+function printSummaryTable() {
+  const reg = loadRegistry();
+  const rows = [];
+  for (const [name, entry] of Object.entries(reg.adapters)) {
+    if (!entry.enabled) continue;
+    const loaded = loadAdapter(name);
+    if (!loaded) continue;
+    const { manifest } = loaded;
+    const serverKeys = manifest.mcpServers || [];
+    const toolNames = (manifest.tools || []).map((t) => t.name);
+    for (const sk of serverKeys) {
+      const tools = toolNames.filter((t) => t === sk || t.startsWith(`${sk}_`));
+      rows.push({ adapter: name, server: sk, namespaced: `${USER_SERVER_KEY_PREFIX}${sk}`, tools });
+    }
+  }
+  if (!rows.length) {
+    console.log('[install] summary: no enabled adapters');
+    return;
+  }
+  // ponytail: fixed widths — no alignment lib; pad() once.
+  const pad = (s, n) => (s + ' '.repeat(n)).slice(0, n);
+  console.log('[install] MCP server -> tool mapping (audit):');
+  console.log(`  ${pad('server', 22)} ${pad('kiro namespaced key', 32)} tools`);
+  console.log(`  ${pad('-'.repeat(22), 22)} ${pad('-'.repeat(32), 32)} ${'-'.repeat(40)}`);
+  for (const r of rows) {
+    console.log(`  ${pad(r.server, 22)} ${pad(r.namespaced, 32)} ${r.tools.join(', ') || '(none)'}`);
+  }
 }
 
 // ---------- main ----------

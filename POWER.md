@@ -1,16 +1,15 @@
 ---
 name: forge-sdlc
-description: Five-stage SDLC workflow — requirements, design, implement, validate, deploy. Start from a free-form requirement or a Jira/ClickUp ticket; the orchestrator materializes a ticket, spawns focused sub-agents per stage, posts humanized status updates to the configured ticket system, and gates each transition on a deterministic validator.
+description: Five-stage SDLC workflow — requirements, design, implement, validate, deploy. Accepts a Jira/ClickUp ticket or a free-form requirement and walks it to a validated PR.
+displayName: Forge SDLC
+author: Forge Team
 keywords:
   - forge
   - pillar-1
   - sdlc
   - jira-to-pr
   - plan-design-build
-  - i have started working
-  - let's build
-  - let's ship
-  - take this to PR
+  - ticket-to-pr
 activation: keyword + natural-language
 version: 2.1.0
 origin: standard-pattern adaptation
@@ -88,12 +87,24 @@ In both cases the rest of the lifecycle is identical: design → implement → v
 
 ## Hooks
 
-`hooks/hooks.json` wires five event handlers:
-- `PreToolUse` — block destructive ops (no `--no-verify`, no writes to linter configs, no secret patterns)
-- `PostToolUse` — capture diffs to session log
-- `SessionStart` — load prior context from `.forge/state.json`
-- `PreCompact` — flush state before context compaction
-- `SessionEnd` — final state snapshot
+`hooks/hooks.json` wires `PreToolUse` / `PostToolUse` / `SessionStart` / `PreCompact` / `SessionEnd` event handlers to scripts in `hooks/`. Each script receives the standard Claude Code hook payload and exits `0` to allow or `2` to block the tool call.
+
+## Onboarding
+
+Enabled adapters (per `adapters/registry.json`) require the following env vars before the orchestrator can run end-to-end:
+
+| Adapter | Env vars |
+|---|---|
+| `jira` | `JIRA_HOST`, `JIRA_EMAIL`, `JIRA_TOKEN` |
+| `github` | `GITHUB_TOKEN` |
+| `context7` | *(none — free for basic use)* |
+
+Toggle adapters with:
+
+```
+node adapters/install.js --enable <name>
+node adapters/install.js --disable <name>
+```
 
 ## Quick start
 
@@ -107,7 +118,7 @@ In both cases the rest of the lifecycle is identical: design → implement → v
 - **Add a stage**: edit `orchestrator.json` and add the new agent JSON under `.kiro/agents/`
 - **Swap a stage model**: change the `model` field in the agent JSON
 - **Change the validator rules**: edit `steering/03-quality-gates.md` — these are loaded as the validator's contract
-- **Add a hook**: append to `hooks/hooks.json` and drop the script in `hooks/`
+- **Add a hook**: append an entry to `hooks/hooks.json` (event → script path) and drop the matching script in `hooks/`. Scripts follow the Claude Code hook contract: read JSON from stdin, exit `0` to allow or `2` to block.
 
 ## Origin and pattern reference
 

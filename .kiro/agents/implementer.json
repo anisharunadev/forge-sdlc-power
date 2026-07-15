@@ -2,6 +2,13 @@
   "name": "implementer",
   "description": "Stage 3 of the forge-sdlc pipeline. Reads the ADR, implements the change, writes tests, and produces a clean diff. The hook layer (PreToolUse) enforces that lockfiles, linter configs, and .env* cannot be edited.",
   "model": "sonnet",
+  "prompt": "file://../../steering/00-governance.md",
+  "resources": [
+    "file://../../steering/01-stage-patterns.md",
+    "file://../../steering/02-tooling-conventions.md",
+    "file://../../adapters/jira/steering/implementer-notes.md",
+    "file://../../adapters/github/steering/implementer-notes.md"
+  ],
   "allowedTools": [
     "Bash",
     "Edit",
@@ -18,47 +25,51 @@
     "jira_add_comment",
     "jira_add_label",
     "jira_post_status_update",
-    "jira_transition"
+    "jira_transition",
+    "mcp__power-forge-sdlc-context7__context7_query_docs",
+    "mcp__power-forge-sdlc-context7__context7_resolve_library_id",
+    "mcp__power-forge-sdlc-github__github_create_branch",
+    "mcp__power-forge-sdlc-github__github_list_branches",
+    "mcp__power-forge-sdlc-github__github_push_files",
+    "mcp__power-forge-sdlc-jira__jira_add_comment",
+    "mcp__power-forge-sdlc-jira__jira_add_label",
+    "mcp__power-forge-sdlc-jira__jira_post_status_update",
+    "mcp__power-forge-sdlc-jira__jira_transition"
   ],
-  "deniedTools": [
-    "Task"
-  ],
-  "writablePaths": [
-    "src/",
-    "app/",
-    "lib/",
-    "tests/",
-    "test/",
-    "**/*.test.{ts,tsx,js,jsx,py}",
-    "**/*.spec.{ts,tsx,js,jsx,py}",
-    ".forge/stage3-diff.diff",
-    ".forge/tech-debt.md"
-  ],
-  "deniedPaths": [
-    "**/*.lock",
-    "**/*.lockb",
-    "package-lock.json",
-    "pnpm-lock.yaml",
-    "yarn.lock",
-    "uv.lock",
-    "poetry.lock",
-    "Cargo.lock",
-    "go.sum",
-    ".env*",
-    "**/.eslintrc*",
-    "biome.json",
-    ".prettierrc*",
-    ".ruff.toml",
-    "tsconfig.json"
-  ],
-  "systemPromptPath": "steering/00-governance.md",
-  "contextSteering": [
-    "steering/01-stage-patterns.md",
-    "steering/02-tooling-conventions.md",
-    "../adapters/jira/steering/implementer-notes.md",
-    "../adapters/github/steering/implementer-notes.md"
-  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "src/",
+        "app/",
+        "lib/",
+        "tests/",
+        "test/",
+        "**/*.test.{ts,tsx,js,jsx,py}",
+        "**/*.spec.{ts,tsx,js,jsx,py}",
+        ".forge/stage3-diff.diff",
+        ".forge/tech-debt.md"
+      ],
+      "deniedPaths": [
+        "**/*.lock",
+        "**/*.lockb",
+        "package-lock.json",
+        "pnpm-lock.yaml",
+        "yarn.lock",
+        "uv.lock",
+        "poetry.lock",
+        "Cargo.lock",
+        "go.sum",
+        ".env*",
+        "**/.eslintrc*",
+        "biome.json",
+        ".prettierrc*",
+        ".ruff.toml",
+        "tsconfig.json"
+      ]
+    }
+  },
+  "includeMcpJson": true,
   "outputBudgetKB": 4,
   "verdictFormat": "VERDICT: PASS | FAIL | NEEDS_INFO",
-  "notes": "May NOT spawn sub-agents. May NOT touch tooling/config files (deniedPaths + hook enforces). May NOT push or deploy — that's the deployer's job."
+  "notes": "May NOT spawn sub-agents (Task not in allowedTools). May NOT touch tooling/config files (deniedPaths + hook enforces). May NOT push or deploy — that's the deployer's job."
 }
