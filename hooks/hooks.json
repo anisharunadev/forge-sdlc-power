@@ -23,6 +23,16 @@
             "description": "Append the operation to .forge/session-log.jsonl for audit"
           }
         ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/post-stage-cmd.js",
+            "description": "After a sub-agent Task completes, write a humanized status-update prompt to .forge/post-stage-prompt.json. The orchestrator picks it up and calls jira_post_status_update (or clickup equivalent) on the next turn."
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -32,6 +42,11 @@
             "type": "command",
             "command": "node hooks/session-start-load-context.js",
             "description": "Load prior state from .forge/state.json if present, surface to orchestrator"
+          },
+          {
+            "type": "command",
+            "command": "node hooks/session-start-pick-ticket-system.js",
+            "description": "Read .forge/ticket-system.json and surface to orchestrator: which ticket system (jira/clickup/none) is configured for this session"
           }
         ]
       }

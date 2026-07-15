@@ -24,6 +24,14 @@
         "GITHUB_DEFAULT_REPO": "${env:GITHUB_DEFAULT_REPO}"
       },
       "description": "GitHub MCP server — repos, branches, PRs, checks. Tools: github_get_repo, github_list_branches, github_create_branch, github_push_files, github_open_pr, github_get_pr, github_request_review."
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "description": "Context7 MCP — live library documentation. Tools: context7_resolve_library_id, context7_query_docs. No API key required for basic use."
     }
   }
 }

@@ -18,6 +18,11 @@
       "readOnly": true
     },
     {
+      "name": "clickup_create_task",
+      "description": "Create a new ClickUp task in a list. Used at the start of the requirements stage when the user has not provided a task ID. Returns the new task's ID.",
+      "stages": ["planner"]
+    },
+    {
       "name": "clickup_update_status",
       "description": "Move a task to a new status (e.g. 'in progress', 'in review', 'complete').",
       "stages": ["implementer", "deployer"],
@@ -27,6 +32,11 @@
       "name": "clickup_add_comment",
       "description": "Post a comment to a ClickUp task. Use to surface PR URLs, validator reports, and blockers.",
       "stages": ["implementer", "deployer", "validator"]
+    },
+    {
+      "name": "clickup_post_status_update",
+      "description": "Post a humanized status update + the next stage's command to a task. Called by the orchestrator at every stage boundary. The post is in plain text (ClickUp markdown) and includes the next slash command to run.",
+      "stages": ["orchestrator", "implementer", "deployer", "validator"]
     },
     {
       "name": "clickup_set_custom_field",
@@ -46,6 +56,11 @@
       "name": "CLICKUP_TEAM_ID",
       "required": true,
       "description": "Numeric team (workspace) ID. Find it in the URL when viewing the workspace."
+    },
+    {
+      "name": "CLICKUP_DEFAULT_LIST_ID",
+      "required": false,
+      "description": "List ID where new tasks land. Required if clickup_create_task is called without a list_id arg."
     }
   ],
   "steering": ["steering/usage.md"],

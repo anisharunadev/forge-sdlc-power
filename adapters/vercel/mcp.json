@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com",
+      "description": "Vercel MCP — deployments, projects, env vars. HTTP transport; no local install required."
+    }
+  }
+}

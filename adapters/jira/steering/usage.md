@@ -14,6 +14,14 @@ This file is loaded into the sub-agent's context when it is about to use a Jira 
 - Use for: reading the spec at the start of plan/validate stages
 - The `acceptanceCriteria` field is the validator's contract — read it first, build the validator report against it
 
+### `jira_create_ticket(project, summary, description, issueType)`
+- Creates a new ticket. Returns the new ticket's key.
+- `project` is the project key (e.g. `PROJ`). Defaults to `JIRA_DEFAULT_PROJECT` env var.
+- `summary` is one line, ≤ 80 chars.
+- `description` is the full requirements text. Use Atlassian Document Format (ADF) or plain text — the tool wraps plain text for you.
+- `issueType` defaults to `JIRA_ISSUE_TYPE` env var or `Task`.
+- Use at the start of the requirements stage when the user has not provided a ticket key (e.g. they typed "i have started working on auth") — the orchestrator calls this to materialize a ticket before proceeding.
+
 ### `jira_search(jql, limit=20)`
 - JQL examples: `project = PROJ AND status != Done`, `assignee = currentUser() AND sprint in openSprints()`, `key in (PROJ-401, PROJ-402)`
 - Use for: finding related tickets, looking up the current sprint, finding blocked work
@@ -30,6 +38,22 @@ This file is loaded into the sub-agent's context when it is about to use a Jira 
 - Use `jira_add_comment` with a small ADF helper if you need formatting — see `jira-formatter.md` if present
 - For plain-text comments, the tool accepts a single paragraph as a string and wraps it for you
 - Include the PR URL in the comment when transitioning to `In Review`
+
+### `jira_post_status_update(key, stage, verdict, next_command, summary)`
+- Posts a humanized status update at every stage boundary.
+- `stage`: current stage name (e.g. `requirements`, `design`, `implement`, `validate`, `deploy`)
+- `verdict`: `PASS | FAIL | NEEDS_INFO | STARTED`
+- `next_command`: the slash command the user should run next, e.g. `/forge design PROJ-401`
+- `summary`: one-sentence humanized status (e.g. "Alex kicked off the work, requirements are being scoped")
+- The tool formats the comment as:
+  ```
+  🤖 **<stage> — <verdict>**
+
+  <summary>
+
+  **Next**: `<next_command>`
+  ```
+  Then posts it as a Jira comment. Always include the next command — that's what the user clicks to advance the workflow.
 
 ### `jira_add_label(key, label)`
 - Labels are plain strings, no spaces

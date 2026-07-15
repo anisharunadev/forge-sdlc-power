@@ -9,6 +9,7 @@
     "Write",
     "github_get_repo",
     "github_list_branches",
+    "jira_create_ticket",
     "jira_get_ticket",
     "jira_search"
   ],

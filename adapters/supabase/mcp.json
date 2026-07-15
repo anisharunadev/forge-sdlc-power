@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest", "--project-ref=${env:SUPABASE_PROJECT_REF}"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${env:SUPABASE_ACCESS_TOKEN}"
+      },
+      "description": "Supabase MCP — DB queries, schema, edge functions. Tools: supabase_list_tables, supabase_execute_sql, supabase_apply_migration, supabase_generate_types, supabase_deploy_edge_function, supabase_get_advisors."
+    }
+  }
+}

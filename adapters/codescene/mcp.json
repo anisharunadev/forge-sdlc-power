@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "codescene": {
+      "command": "npx",
+      "args": ["-y", "@codescene/codehealth-mcp"],
+      "env": {
+        "CS_ACCESS_TOKEN": "${env:CS_ACCESS_TOKEN}"
+      },
+      "description": "CodeScene MCP — Code Health + code review. Tools: codescene_health_check, codescene_code_review. Optional, requires CS_ACCESS_TOKEN."
+    }
+  }
+}

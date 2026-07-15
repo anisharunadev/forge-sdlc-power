@@ -56,6 +56,36 @@ REASON: <stage> could not complete within context budget — escalate to orchest
 
 Never return empty. Never return ambiguous. The orchestrator cannot act on silence.
 
+## 7. Humanized status updates (the post-stage-cmd flow)
+
+After you finish a stage, the orchestrator will post a humanized status update to the configured ticket system (Jira, ClickUp, or whatever the user enabled). The post includes:
+
+- The current stage name
+- Your verdict (`PASS | FAIL | NEEDS_INFO | STARTED`)
+- A one-sentence humanized summary
+- The next slash command the user should run
+
+The post-stage-cmd.js hook reads your output, parses the verdict, and writes a formatted prompt to `.forge/post-stage-prompt.json`. The orchestrator picks it up and calls the configured `*_post_status_update` tool.
+
+To make the post read well:
+
+- If you have time, write a `SUMMARY: <one sentence>` line just above the verdict. The hook prefers this over its default summary.
+- Don't leak the verdict line itself (e.g. `VERDICT: PASS`) in the body. The verdict is in the header; the body should explain it in human terms.
+- Use plain English. No emoji beyond the 🤖 header the post adds. No ADF tables. No jargon.
+
+Example good output:
+```
+SUMMARY: Wrote 3 new tests for the SAML callback handler, all passing.
+VERDICT: PASS
+```
+
+Example bad output (no summary line, just verdict):
+```
+VERDICT: PASS
+```
+
+Both will post, but the first reads better in the ticket comment.
+
 ---
 
 **This file is loaded `inclusion: always`. It is the one file you cannot skip. Treat it as law.**

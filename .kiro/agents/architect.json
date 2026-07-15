@@ -7,6 +7,8 @@
     "Grep",
     "Read",
     "Write",
+    "context7_query_docs",
+    "context7_resolve_library_id",
     "github_get_repo",
     "jira_get_ticket",
     "jira_search"

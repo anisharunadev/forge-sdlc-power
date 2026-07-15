@@ -1,0 +1,64 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "supabase",
+  "version": "1.0.0",
+  "description": "Supabase database, auth, and edge functions — query the DB, manage schema, deploy edge functions. Use for any project backed by Supabase.",
+  "mcpServers": ["supabase"],
+  "tools": [
+    {
+      "name": "supabase_list_tables",
+      "description": "List all tables in the project's public schema.",
+      "stages": ["planner", "architect", "validator"],
+      "readOnly": true
+    },
+    {
+      "name": "supabase_execute_sql",
+      "description": "Run a read-only SQL query against the database. Use to inspect data, not to mutate (use supabase_apply_migration for that).",
+      "stages": ["planner", "architect", "validator"],
+      "readOnly": true
+    },
+    {
+      "name": "supabase_apply_migration",
+      "description": "Apply a SQL migration. DESTRUCTIVE — the hook layer will require an explicit confirmation file at .forge/supabase-migration-approved before this can run.",
+      "stages": ["implementer"]
+    },
+    {
+      "name": "supabase_generate_types",
+      "description": "Generate TypeScript types from the current database schema. Useful for keeping the frontend in sync after schema changes.",
+      "stages": ["implementer"],
+      "idempotent": true
+    },
+    {
+      "name": "supabase_deploy_edge_function",
+      "description": "Deploy a Supabase Edge Function. The deployer calls this after a function is implemented and tested locally.",
+      "stages": ["deployer"]
+    },
+    {
+      "name": "supabase_get_advisors",
+      "description": "Run Supabase performance and security advisors. Called by the validator to catch RLS gaps, missing indexes, and slow queries.",
+      "stages": ["validator"],
+      "readOnly": true
+    }
+  ],
+  "envVars": [
+    {
+      "name": "SUPABASE_PROJECT_REF",
+      "required": true,
+      "description": "Project reference (the subdomain in your Supabase URL, e.g. 'abcdefgh' for 'abcdefgh.supabase.co')."
+    },
+    {
+      "name": "SUPABASE_ACCESS_TOKEN",
+      "required": true,
+      "secret": true,
+      "description": "Personal access token from supabase.com/dashboard/account/tokens."
+    }
+  ],
+  "steering": ["steering/usage.md"],
+  "stage": {
+    "implementer": {
+      "systemPromptAdditions": "steering/implementer-notes.md"
+    }
+  },
+  "homepage": "https://supabase.com",
+  "license": "MIT"
+}

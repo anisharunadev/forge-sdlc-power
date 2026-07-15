@@ -1,0 +1,43 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "playwright",
+  "version": "1.0.0",
+  "description": "Browser automation via Playwright. Use during the validator stage for E2E checks against the running preview deployment.",
+  "mcpServers": ["playwright"],
+  "tools": [
+    {
+      "name": "playwright_navigate",
+      "description": "Navigate to a URL in a headless browser.",
+      "stages": ["validator"],
+      "readOnly": true
+    },
+    {
+      "name": "playwright_screenshot",
+      "description": "Take a screenshot of the current page. The validator uses this to capture evidence of UI state.",
+      "stages": ["validator"],
+      "readOnly": true
+    },
+    {
+      "name": "playwright_assert_text",
+      "description": "Assert that a CSS selector contains expected text. The validator uses this for E2E acceptance criteria checks.",
+      "stages": ["validator"],
+      "readOnly": true
+    },
+    {
+      "name": "playwright_click",
+      "description": "Click an element. Use to navigate flows, submit forms, trigger state changes.",
+      "stages": ["validator"],
+      "readOnly": true
+    },
+    {
+      "name": "playwright_fill",
+      "description": "Fill an input field. Use to drive form-based flows.",
+      "stages": ["validator"],
+      "readOnly": true
+    }
+  ],
+  "envVars": [],
+  "steering": ["steering/usage.md"],
+  "homepage": "https://playwright.dev",
+  "license": "MIT"
+}

@@ -18,6 +18,12 @@
       "readOnly": true
     },
     {
+      "name": "jira_create_ticket",
+      "description": "Create a new Jira ticket. Used at the start of the requirements stage when the user has not provided a ticket key. Returns the new ticket's key.",
+      "stages": ["planner"],
+      "idempotent": false
+    },
+    {
       "name": "jira_transition",
       "description": "Move a ticket through workflow states (e.g. To Do → In Progress → In Review → Done).",
       "stages": ["implementer", "deployer"],
@@ -27,6 +33,11 @@
       "name": "jira_add_comment",
       "description": "Post a comment to a Jira ticket. Use to surface PR URLs, validator reports, and blockers.",
       "stages": ["implementer", "deployer", "validator"]
+    },
+    {
+      "name": "jira_post_status_update",
+      "description": "Post a humanized status update + the next stage's command to a ticket. Called by the orchestrator at every stage boundary. The post is in plain English (no ADF) and includes the next slash command to run.",
+      "stages": ["orchestrator", "implementer", "deployer", "validator"]
     },
     {
       "name": "jira_add_label",
@@ -51,6 +62,16 @@
       "required": true,
       "secret": true,
       "description": "API token from id.atlassian.com → Security → API tokens. NEVER commit."
+    },
+    {
+      "name": "JIRA_DEFAULT_PROJECT",
+      "required": false,
+      "description": "Project key to use when jira_create_ticket is called without a project arg, e.g. 'PROJ'."
+    },
+    {
+      "name": "JIRA_ISSUE_TYPE",
+      "required": false,
+      "description": "Default issue type for new tickets, e.g. 'Task', 'Story', 'Bug'. Defaults to 'Task'."
     }
   ],
   "steering": ["steering/usage.md", "steering/jql-reference.md"],

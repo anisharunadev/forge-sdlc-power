@@ -1,0 +1,25 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "context7",
+  "version": "1.0.0",
+  "description": "Live documentation lookup. Use during the architect or implementer stage to pull the current API docs for a library, rather than relying on training data.",
+  "mcpServers": ["context7"],
+  "tools": [
+    {
+      "name": "context7_resolve_library_id",
+      "description": "Resolve a library name (e.g. 'next.js', 'react') to a context7-compatible ID. Call this first before querying docs.",
+      "stages": ["architect", "implementer", "validator"],
+      "readOnly": true
+    },
+    {
+      "name": "context7_query_docs",
+      "description": "Fetch live documentation for a library. Returns code snippets and prose from the upstream docs, not the model's training data.",
+      "stages": ["architect", "implementer", "validator"],
+      "readOnly": true
+    }
+  ],
+  "envVars": [],
+  "steering": ["steering/usage.md"],
+  "homepage": "https://context7.com",
+  "license": "MIT"
+}

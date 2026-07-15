@@ -1,0 +1,54 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "railway",
+  "version": "1.0.0",
+  "description": "Railway deployments and project configuration. Drop-in alternative to the Vercel adapter for projects hosted on Railway.",
+  "mcpServers": ["railway"],
+  "tools": [
+    {
+      "name": "railway_list_projects",
+      "description": "List all Railway projects.",
+      "stages": ["planner"],
+      "readOnly": true
+    },
+    {
+      "name": "railway_list_services",
+      "description": "List services in a project. A service is one deployable unit (web, worker, database, etc.).",
+      "stages": ["planner", "architect"],
+      "readOnly": true
+    },
+    {
+      "name": "railway_list_deployments",
+      "description": "List recent deployments for a service. Returns status, commit, and deployment URL.",
+      "stages": ["validator", "deployer"],
+      "readOnly": true
+    },
+    {
+      "name": "railway_get_deployment_logs",
+      "description": "Fetch build and runtime logs. Used by the validator to diagnose deploy failures.",
+      "stages": ["validator"],
+      "readOnly": true
+    },
+    {
+      "name": "railway_set_env",
+      "description": "Set an env var on a service. Sensitive values (SECRET/TOKEN/KEY in the name) are blocked by the hook — user-only.",
+      "stages": ["deployer"]
+    },
+    {
+      "name": "railway_redeploy",
+      "description": "Trigger a redeploy of a service. Used by the deployer after env-var changes.",
+      "stages": ["deployer"]
+    }
+  ],
+  "envVars": [
+    {
+      "name": "RAILWAY_TOKEN",
+      "required": true,
+      "secret": true,
+      "description": "Railway API token from railway.app/dashboard → Account Settings → Tokens."
+    }
+  ],
+  "steering": ["steering/usage.md"],
+  "homepage": "https://railway.app",
+  "license": "MIT"
+}

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp", "--browser", "chrome"],
+      "description": "Playwright MCP — headless browser automation. Tools: playwright_navigate, playwright_screenshot, playwright_assert_text, playwright_click, playwright_fill."
+    }
+  }
+}

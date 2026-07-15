@@ -1,0 +1,7 @@
+{
+  "1": "/forge design <KEY>",
+  "2": "/forge implement <KEY>",
+  "3": "/forge validate <KEY>",
+  "4": "/forge deploy <KEY>",
+  "5": "review and merge"
+}

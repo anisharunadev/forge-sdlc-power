@@ -23,14 +23,28 @@ The template gives you:
 | See the canonical (large) example | [`POWER.md`](POWER.md) + [`.kiro/agents/`](.kiro/agents/) + [`steering/`](steering/) |
 | See the small example | [`examples/security-audit/`](examples/security-audit/) |
 | Build a new Power from this template | Copy a templates file, follow SKILL.md step by step |
+| Add a new external integration (Jira, GitHub, Bitbucket, ClickUp, anything) | [`adapters/`](adapters/) + [`skills/build-adapter/SKILL.md`](skills/build-adapter/SKILL.md) |
 | Adopt ECC's governance rules | [`rules/`](rules/) — copy what you need into `steering/rules/` with `inclusion: always` |
+| See the full lifecycle flow (start → ticket → status updates → PR) | [`POWER.md`](POWER.md) § "Lifecycle entry points" + [`steering/05-requirements-stage.md`](steering/05-requirements-stage.md) |
+| See how the orchestrator posts humanized status updates | [`adapters/jira/steering/humanized-status.md`](adapters/jira/steering/humanized-status.md) + [`hooks/post-stage-cmd.js`](hooks/post-stage-cmd.js) |
 
 ## File layout
 
 ```
 forge-sdlc-power/
 ├── POWER.md                           # canonical example frontmatter
-├── mcp.json                           # MCP server wiring (Jira, GitHub)
+├── mcp.json                           # MCP server wiring (Jira, GitHub) — populated by adapters/install.js
+├── adapters/                          # pluggable external integrations
+│   ├── README.md                     # adapter system overview
+│   ├── adapter.schema.json           # JSON schema for adapter.json manifests
+│   ├── registry.json                 # enabled/disabled state for each adapter
+│   ├── install.js                    # merges per-adapter mcp.json, updates agent allowedTools
+│   ├── install.test.js               # 5 install-script tests
+│   ├── jira/                         # reference adapter #1
+│   ├── github/                       # reference adapter #2
+│   ├── bitbucket/                    # reference adapter #3
+│   ├── clickup/                      # reference adapter #4
+│   └── custom-template/              # scaffold for new adapters
 ├── steering/                          # SKILL.md equivalent — on-demand knowledge
 │   ├── 00-governance.md              # Always mode
 │   ├── 01-stage-patterns.md          # fileMatch — source files

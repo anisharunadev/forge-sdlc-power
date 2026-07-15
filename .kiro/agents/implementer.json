@@ -10,11 +10,14 @@
     "MultiEdit",
     "Read",
     "Write",
+    "context7_query_docs",
+    "context7_resolve_library_id",
     "github_create_branch",
     "github_list_branches",
     "github_push_files",
     "jira_add_comment",
     "jira_add_label",
+    "jira_post_status_update",
     "jira_transition"
   ],
   "deniedTools": [

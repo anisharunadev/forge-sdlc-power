@@ -1,0 +1,53 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "vercel",
+  "version": "1.0.0",
+  "description": "Vercel deployments and project configuration. Use for any project deployed to Vercel — preview deployments, production releases, env-var management.",
+  "mcpServers": ["vercel"],
+  "tools": [
+    {
+      "name": "vercel_list_projects",
+      "description": "List all Vercel projects in the team.",
+      "stages": ["planner"],
+      "readOnly": true
+    },
+    {
+      "name": "vercel_list_deployments",
+      "description": "List recent deployments for a project. Returns status, branch, commit, and URL.",
+      "stages": ["validator", "deployer"],
+      "readOnly": true
+    },
+    {
+      "name": "vercel_get_deployment_logs",
+      "description": "Fetch build and runtime logs for a deployment. Used by the validator to diagnose build failures.",
+      "stages": ["validator"],
+      "readOnly": true
+    },
+    {
+      "name": "vercel_promote_to_production",
+      "description": "Promote a preview deployment to production. The hook layer requires a separate .forge/vercel-prod-approved file before this runs.",
+      "stages": ["deployer"]
+    },
+    {
+      "name": "vercel_set_env",
+      "description": "Set an environment variable on a project. Sensitive values (containing SECRET/TOKEN/KEY in the name) require the user to provide the value directly — never write secrets from the model.",
+      "stages": ["deployer"]
+    }
+  ],
+  "envVars": [
+    {
+      "name": "VERCEL_TOKEN",
+      "required": true,
+      "secret": true,
+      "description": "Vercel API token from vercel.com/dashboard → Settings → Tokens."
+    },
+    {
+      "name": "VERCEL_TEAM_ID",
+      "required": false,
+      "description": "Team ID if the project is in a team. Optional for personal accounts."
+    }
+  ],
+  "steering": ["steering/usage.md"],
+  "homepage": "https://vercel.com",
+  "license": "MIT"
+}

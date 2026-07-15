@@ -14,6 +14,13 @@ ClickUp has a different mental model than Jira — Tasks live in Lists, Lists li
 - `task_id` is the ClickUp task ID (e.g. `abc123`), not a human-readable key like Jira's `PROJ-401`
 - Use the custom field `forge_ticket_key` if your workspace has one set, to map human keys to IDs
 
+### `clickup_create_task(list_id, name, description)`
+- Creates a new task in the given list. Returns the new task's ID.
+- `list_id` defaults to `CLICKUP_DEFAULT_LIST_ID` env var.
+- `name` is the task title (one line).
+- `description` is the full requirements text in plain text or ClickUp-flavored markdown.
+- Use at the start of the requirements stage when the user has not provided a task ID — the orchestrator calls this to materialize a task before proceeding.
+
 ### `clickup_search_tasks(filters)`
 - Filters: `list_id`, `space_id`, `statuses[]`, `assignees[]`, `tags[]`
 - Returns task IDs and summaries
@@ -28,6 +35,12 @@ ClickUp has a different mental model than Jira — Tasks live in Lists, Lists li
 - Body is plain text or ClickUp-flavored markdown (their variant supports most common formatting)
 - Use for PR URL, validator verdict, and blocker notes
 - Comments are visible to anyone with access to the task
+
+### `clickup_post_status_update(task_id, stage, verdict, next_command, summary)`
+- Posts a humanized status update at every stage boundary.
+- Format mirrors `jira_post_status_update` — see `humanized-status.md` for the style guide.
+- If the workspace has a `forge_status` custom field, also set its value to the verdict.
+- Always include the next slash command — the user copies it from the comment to resume the workflow.
 
 ### `clickup_set_custom_field(task_id, field_id, value)`
 - `field_id` is the custom field's UUID (not its name). Find via `clickup_get_task` first

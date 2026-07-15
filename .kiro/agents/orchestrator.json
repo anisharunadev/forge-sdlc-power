@@ -1,13 +1,14 @@
 {
   "name": "orchestrator",
-  "description": "Team lead for the forge-sdlc pipeline. Reads workflow state, decides which sub-agent to spawn next, parses verdict lines, and routes between stages. Coordinates; never executes stage work itself.",
+  "description": "Team lead for the forge-sdlc pipeline. Reads workflow state, decides which sub-agent to spawn next, parses verdict lines, routes between stages, and posts humanized status updates to the configured ticket system. Coordinates; never executes stage work itself.",
   "model": "opus",
   "allowedTools": [
-    "Read",
     "Glob",
     "Grep",
+    "Read",
     "Task",
-    "TodoWrite"
+    "TodoWrite",
+    "jira_post_status_update"
   ],
   "deniedTools": [
     "Write",
@@ -17,12 +18,48 @@
   ],
   "systemPromptPath": "steering/00-governance.md",
   "stages": [
-    { "id": 1, "agent": "planner", "gate": "always" },
-    { "id": 2, "agent": "architect", "gate": "stage1_verdict == PASS" },
-    { "id": 3, "agent": "implementer", "gate": "stage2_verdict == PASS" },
-    { "id": 4, "agent": "validator", "gate": "stage3_verdict == PASS" },
-    { "id": 5, "agent": "deployer", "gate": "stage4_verdict == PASS" }
+    {
+      "id": 1,
+      "name": "requirements",
+      "agent": "planner",
+      "gate": "always"
+    },
+    {
+      "id": 2,
+      "name": "design",
+      "agent": "architect",
+      "gate": "stage1_verdict == PASS"
+    },
+    {
+      "id": 3,
+      "name": "implement",
+      "agent": "implementer",
+      "gate": "stage2_verdict == PASS"
+    },
+    {
+      "id": 4,
+      "name": "validate",
+      "agent": "validator",
+      "gate": "stage3_verdict == PASS"
+    },
+    {
+      "id": 5,
+      "name": "deploy",
+      "agent": "deployer",
+      "gate": "stage4_verdict == PASS"
+    }
   ],
+  "postStageActions": {
+    "_comment": "After every stage, the orchestrator must call the post_status_update tool on the configured ticket system. The post-stage-cmd.js hook writes the formatted prompt to .forge/post-stage-prompt.json — the orchestrator's job is to read it and call the tool.",
+    "toolSource": "adapters",
+    "toolNameTemplate": "{ticketSystem}_post_status_update",
+    "ticketIdSource": ".forge/ticket-id.txt",
+    "promptFile": ".forge/post-stage-prompt.json"
+  },
+  "ticketSystem": {
+    "_comment": "Auto-detected by install.js. Reads .forge/ticket-system.json on each session start. Priority: jira > clickup > linear > none.",
+    "configFile": ".forge/ticket-system.json"
+  },
   "maxCycles": 3,
-  "notes": "allowedTools deliberately excludes Write/Edit/Bash — the orchestrator coordinates via Task spawn, never edits files itself. If a stage needs a file written, that file's owner is the relevant sub-agent."
+  "notes": "allowedTools deliberately excludes Write/Edit/Bash — the orchestrator coordinates via Task spawn, never edits files itself. If a stage needs a file written, that file's owner is the relevant sub-agent. The orchestrator's runtime allowedTools will be augmented by the install script with post_status_update tools from any enabled ticket-system adapter (jira_post_status_update, clickup_post_status_update, etc.)."
 }

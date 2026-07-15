@@ -12,15 +12,45 @@
       "installedAt": "2026-07-15T18:46:00Z",
       "version": "1.0.0"
     },
+    "clickup": {
+      "enabled": false,
+      "version": "1.0.0",
+      "reason": "Not used in this project. Enable with: node adapters/install.js --enable clickup"
+    },
     "bitbucket": {
       "enabled": false,
       "version": "1.0.0",
       "reason": "Not used in this project. Enable with: node adapters/install.js --enable bitbucket"
     },
-    "clickup": {
+    "supabase": {
       "enabled": false,
       "version": "1.0.0",
-      "reason": "Not used in this project. Enable with: node adapters/install.js --enable clickup"
+      "reason": "Enable if the project is backed by Supabase. Requires SUPABASE_PROJECT_REF and SUPABASE_ACCESS_TOKEN env vars."
+    },
+    "vercel": {
+      "enabled": false,
+      "version": "1.0.0",
+      "reason": "Enable if the project deploys to Vercel. Requires VERCEL_TOKEN env var."
+    },
+    "railway": {
+      "enabled": false,
+      "version": "1.0.0",
+      "reason": "Enable if the project deploys to Railway. Requires RAILWAY_TOKEN env var."
+    },
+    "context7": {
+      "enabled": true,
+      "installedAt": "2026-07-15T18:46:00Z",
+      "version": "1.0.0"
+    },
+    "playwright": {
+      "enabled": false,
+      "version": "1.0.0",
+      "reason": "Enable for E2E checks during validation. No env vars required."
+    },
+    "codescene": {
+      "enabled": false,
+      "version": "1.0.0",
+      "reason": "OPTIONAL. Enable only if you have a CodeScene Cloud account and want advisory code-health scoring. Requires CS_ACCESS_TOKEN. See adapters/codescene/steering/data-boundaries.md before enabling."
     }
   }
 }

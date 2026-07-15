@@ -12,6 +12,7 @@
     "github_open_pr",
     "github_request_review",
     "jira_add_comment",
+    "jira_post_status_update",
     "jira_transition"
   ],
   "deniedTools": [

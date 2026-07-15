@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "railway": {
+      "command": "npx",
+      "args": ["-y", "@railway/mcp-server"],
+      "env": {
+        "RAILWAY_TOKEN": "${env:RAILWAY_TOKEN}"
+      },
+      "description": "Railway MCP — projects, services, deployments, env vars. Tools: railway_list_projects, railway_list_services, railway_list_deployments, railway_get_deployment_logs, railway_set_env, railway_redeploy."
+    }
+  }
+}

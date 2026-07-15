@@ -1,14 +1,18 @@
 ---
 name: forge-sdlc
-description: Five-stage SDLC workflow — plan, design, implement, validate, ship. The orchestrator spawns focused sub-agents per stage, each with a narrow allowedTools bundle, gated by deterministic validators and enforced by ECC-pattern hooks.
+description: Five-stage SDLC workflow — requirements, design, implement, validate, deploy. Start from a free-form requirement or a Jira/ClickUp ticket; the orchestrator materializes a ticket, spawns focused sub-agents per stage, posts humanized status updates to the configured ticket system, and gates each transition on a deterministic validator.
 keywords:
   - forge
   - pillar-1
   - sdlc
   - jira-to-pr
   - plan-design-build
-activation: keyword
-version: 2.0.0
+  - i have started working
+  - let's build
+  - let's ship
+  - take this to PR
+activation: keyword + natural-language
+version: 2.1.0
 origin: ECC-pattern adaptation
 ---
 
@@ -19,41 +23,58 @@ This Power implements a five-stage SDLC workflow using the ECC pattern: thin com
 ## When to activate
 
 Activate this Power when the user signals any of:
-- "forge", "pillar-1", "sdlc" — start the full pipeline
-- "jira-to-pr" — specific entry point: ticket → PR
-- "plan-design-build" — explicit stage chain
-- A Jira ticket key is mentioned (e.g. `PROJ-401`) and a workflow is implied
+- A keyword: "forge", "pillar-1", "sdlc", "jira-to-pr", "plan-design-build", "take this to PR"
+- A natural-language opener: "i have started working on X", "let's build X", "let's ship X", "let's get X to a PR"
+- A Jira/ClickUp identifier with intent: `PROJ-401`, `task abc123`, etc.
+- A free-form requirement that should go through the full pipeline
 
 Do **not** activate for single-shot tasks (debugging, one-line edits, isolated questions). Use plain Kiro for those.
 
 ## Architecture (read this once)
 
 ```
-USER TYPES KEYWORD
+USER TYPES KEYWORD or natural-language opener
        │
        ▼
- ┌─────────────────┐
- │   orchestrator   │  ← knows the workflow, never does the work
- │   (allowedTools: │     { Task, Read, write_steering, read_steering }
- │    coordination) │
- └────────┬────────┘
+ ┌─────────────────────────────────────────────┐
+ │              orchestrator                   │
+ │  ← knows the workflow, never does the work  │
+ │  ← reads .forge/ticket-system.json         │
+ │  ← reads .forge/post-stage-prompt.json     │
+ │  ← calls <system>_post_status_update       │
+ │        on every stage boundary              │
+ └────────┬────────────────────────────────────┘
           │ spawns
           ▼
- ┌─────────────────────────────────────────────────┐
- │  planner → architect → implementer → validator  │
- │                              ↑         ↓        │
- │                              └── retry ┘        │
- │  validator is INDEPENDENT — different prompt,   │
- │  different allowedTools, different model        │
- └─────────────────────────────────────────────────┘
+ ┌───────────────────────────────────────────────────────┐
+ │  requirements → design → implement → validate → deploy│
+ │              ↑                          ↑      ↓      │
+ │              │                          └── retry     │
+ │              └── if no ticket provided:                │
+ │                  planner calls jira_create_ticket      │
+ │                  (or clickup_create_task)              │
+ └───────────────────────────────────────────────────────┘
           │
           ▼
- ┌─────────────────┐
- │     deployer     │  ← only fires if validator passes
- └─────────────────┘
+ ┌─────────────────────────────────────────┐
+ │  configured ticket system (jira/clickup) │
+ │  ← every stage posts a humanized update  │
+ │  ← every stage posts the next slash cmd  │
+ └─────────────────────────────────────────┘
 ```
 
-Each sub-agent has a **narrow `allowedTools` allowlist** (tool-bundle-per-stage). The validator cannot write code. The implementer cannot deploy. The orchestrator cannot do work itself.
+Each sub-agent has a **narrow `allowedTools` allowlist** (tool-bundle-per-stage). The validator cannot write code. The implementer cannot deploy. The orchestrator cannot do work itself. The deployer cannot merge PRs.
+
+## Lifecycle entry points
+
+The pipeline accepts two entry shapes:
+
+| User says | What happens |
+|---|---|
+| `forge PROJ-401` | Orchestrator sets `.forge/ticket-id.txt = PROJ-401`, planner fetches the ticket, proceeds. |
+| `i have started working on auth` | Orchestrator sets `.forge/ticket-id.txt = (empty)`, planner calls `jira_create_ticket(...)` (or `clickup_create_task(...)`), writes the new ticket id to `.forge/ticket-id.txt`, then proceeds. |
+
+In both cases the rest of the lifecycle is identical: design → implement → validate → deploy, with a humanized status post to the configured ticket system at every stage boundary.
 
 ## Steering layout
 

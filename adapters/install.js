@@ -157,7 +157,9 @@ function updateAgentAllowedTools() {
 
   for (const [name, entry] of Object.entries(reg.adapters)) {
     if (!entry.enabled) continue;
-    const { manifest } = loadAdapter(name);
+    const loaded = loadAdapter(name);
+    if (!loaded) continue;
+    const { manifest } = loaded;
     for (const tool of manifest.tools || []) {
       for (const stage of tool.stages || []) {
         if (stage === '*') {
@@ -222,7 +224,9 @@ function applyStageAdditions() {
   const reg = loadRegistry();
   for (const [name, entry] of Object.entries(reg.adapters)) {
     if (!entry.enabled) continue;
-    const { manifest } = loadAdapter(name);
+    const loaded = loadAdapter(name);
+    if (!loaded) continue;
+    const { manifest } = loaded;
     if (!manifest.stage) continue;
 
     for (const [stage, cfg] of Object.entries(manifest.stage)) {
@@ -339,6 +343,56 @@ function apply() {
   updateAgentAllowedTools();
   linkAdapterSteering();
   applyStageAdditions();
+  writeTicketSystemConfig();
+  writeNextCommandsConfig();
+}
+
+// ---------- ticket-system + next-commands config writers ----------
+//
+// The post-stage-cmd.js hook needs to know:
+//   1. Which ticket system is configured (jira | clickup | none)
+//   2. The next-command template per stage
+//
+// These writers run after every apply() so the hook and orchestrator can
+// read .forge/ticket-system.json and .forge/next-commands.json without
+// having to re-parse the registry.
+
+function writeTicketSystemConfig() {
+  const reg = loadRegistry();
+  // Priority order: jira > clickup > none
+  // First match wins. If both are enabled, jira takes precedence (it's the
+  // more common default in the ECC ecosystem). The user can override by
+  // disabling the higher-priority one.
+  let system = null;
+  if (reg.adapters.jira && reg.adapters.jira.enabled) system = 'jira';
+  else if (reg.adapters.clickup && reg.adapters.clickup.enabled) system = 'clickup';
+  else if (reg.adapters.linear && reg.adapters.linear.enabled) system = 'linear';
+
+  const dir = path.join(ROOT, '.forge');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, 'ticket-system.json'),
+    JSON.stringify({ system, updatedAt: new Date().toISOString() }, null, 2) + '\n'
+  );
+  if (system) console.log(`[install] ticket system: ${system}`);
+}
+
+function writeNextCommandsConfig() {
+  // The default next-command template. The orchestrator uses this after each
+  // stage to know what slash command to put in the status update.
+  const commands = {
+    '1': '/forge design <KEY>',
+    '2': '/forge implement <KEY>',
+    '3': '/forge validate <KEY>',
+    '4': '/forge deploy <KEY>',
+    '5': 'review and merge',
+  };
+  const dir = path.join(ROOT, '.forge');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, 'next-commands.json'),
+    JSON.stringify(commands, null, 2) + '\n'
+  );
 }
 
 // ---------- main ----------

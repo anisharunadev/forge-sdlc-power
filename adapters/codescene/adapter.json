@@ -1,0 +1,32 @@
+{
+  "$schema": "../adapter.schema.json",
+  "name": "codescene",
+  "version": "1.0.0",
+  "description": "CodeScene Code Health analysis. Optional — only enable if you have a CodeScene Cloud account. The validator calls this for code-health scoring on the diff.",
+  "mcpServers": ["codescene"],
+  "tools": [
+    {
+      "name": "codescene_health_check",
+      "description": "Run Code Health analysis on a file or diff. Returns a 0-10 health score per file plus hotspots.",
+      "stages": ["validator"],
+      "readOnly": true
+    },
+    {
+      "name": "codescene_code_review",
+      "description": "Run a code review on a diff. Returns findings categorized as 'must-fix', 'should-fix', 'consider'.",
+      "stages": ["validator"],
+      "readOnly": true
+    }
+  ],
+  "envVars": [
+    {
+      "name": "CS_ACCESS_TOKEN",
+      "required": true,
+      "secret": true,
+      "description": "CodeScene Cloud access token. Get from codescene.io → Account → API Access."
+    }
+  ],
+  "steering": ["steering/usage.md", "steering/data-boundaries.md"],
+  "homepage": "https://codescene.io",
+  "license": "MIT"
+}
